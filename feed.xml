@@ -3,10 +3,10 @@
   <channel>
     <title>Way-Up 2020-2022</title>
     <description>Dokunentation meiner Ausbildung bei Puzzle ITC zum Systemtechniker EFZ.</description>
-    <link>https://dongiovanni83.github.io/lerndokumentation/</link>
-    <atom:link href="https://dongiovanni83.github.io/lerndokumentation//feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 21 Aug 2020 20:13:41 +0000</pubDate>
-    <lastBuildDate>Fri, 21 Aug 2020 20:13:41 +0000</lastBuildDate>
+    <link>lerndokumentationhttps://dongiovanni83.github.io/lerndokumentation/</link>
+    <atom:link href="https://dongiovanni83.github.io/lerndokumentation/lerndokumentation/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Fri, 21 Aug 2020 20:18:19 +0000</pubDate>
+    <lastBuildDate>Fri, 21 Aug 2020 20:18:19 +0000</lastBuildDate>
     <generator>Jekyll v4.1.1</generator>
     
       <item>
@@ -14,8 +14,8 @@
         <description>
 </description>
         <pubDate>Fri, 21 Aug 2020 00:00:00 +0000</pubDate>
-        <link>https://dongiovanni83.github.io/lerndokumentation//2020/08/21/ubuntu-20.04-user-setup-mit-ansible/</link>
-        <guid isPermaLink="true">https://dongiovanni83.github.io/lerndokumentation//2020/08/21/ubuntu-20.04-user-setup-mit-ansible/</guid>
+        <link>https://dongiovanni83.github.io/lerndokumentation/lerndokumentation/2020/08/21/ubuntu-20.04-user-setup-mit-ansible/</link>
+        <guid isPermaLink="true">https://dongiovanni83.github.io/lerndokumentation/lerndokumentation/2020/08/21/ubuntu-20.04-user-setup-mit-ansible/</guid>
         
         <category>Ansible</category>
         
@@ -82,8 +82,8 @@
 &lt;p&gt;Bei diesem kleinen Experiment war nicht nur spannend zu sehen wie Prometheus und Grafana zusammen funktionieren, sondern auch das Konfigurieren der Docker-Container. Dabei war es wichtig die Container über die benötigten Ports erreichbar für die Anderen zu machen, damit jeder Container seine benötigten Informationen beim jeweiligen Container abholen kann.&lt;/p&gt;
 </description>
         <pubDate>Sun, 26 Jul 2020 00:00:00 +0000</pubDate>
-        <link>https://dongiovanni83.github.io/lerndokumentation//2020/07/26/prometheus/</link>
-        <guid isPermaLink="true">https://dongiovanni83.github.io/lerndokumentation//2020/07/26/prometheus/</guid>
+        <link>https://dongiovanni83.github.io/lerndokumentation/lerndokumentation/2020/07/26/prometheus/</link>
+        <guid isPermaLink="true">https://dongiovanni83.github.io/lerndokumentation/lerndokumentation/2020/07/26/prometheus/</guid>
         
         <category>Prometheus</category>
         
@@ -117,8 +117,8 @@ lernen konnte in einem weiteren &lt;a href=&quot;/2020/07/31/ansible-labs&quot;&
 &lt;h2 id=&quot;6_networking&quot;&gt;6_networking&lt;/h2&gt;
 </description>
         <pubDate>Fri, 24 Jul 2020 00:00:00 +0000</pubDate>
-        <link>https://dongiovanni83.github.io/lerndokumentation//2020/07/24/sys-labs/</link>
-        <guid isPermaLink="true">https://dongiovanni83.github.io/lerndokumentation//2020/07/24/sys-labs/</guid>
+        <link>https://dongiovanni83.github.io/lerndokumentation/lerndokumentation/2020/07/24/sys-labs/</link>
+        <guid isPermaLink="true">https://dongiovanni83.github.io/lerndokumentation/lerndokumentation/2020/07/24/sys-labs/</guid>
         
         <category>Linux</category>
         
@@ -130,8 +130,8 @@ lernen konnte in einem weiteren &lt;a href=&quot;/2020/07/31/ansible-labs&quot;&
         <description>
 </description>
         <pubDate>Sat, 08 Feb 2020 00:00:00 +0000</pubDate>
-        <link>https://dongiovanni83.github.io/lerndokumentation//2020/02/08/ubuntu-20.04-usb-preseed/</link>
-        <guid isPermaLink="true">https://dongiovanni83.github.io/lerndokumentation//2020/02/08/ubuntu-20.04-usb-preseed/</guid>
+        <link>https://dongiovanni83.github.io/lerndokumentation/lerndokumentation/2020/02/08/ubuntu-20.04-usb-preseed/</link>
+        <guid isPermaLink="true">https://dongiovanni83.github.io/lerndokumentation/lerndokumentation/2020/02/08/ubuntu-20.04-usb-preseed/</guid>
         
         <category>Ubuntu</category>
         
@@ -145,8 +145,8 @@ lernen konnte in einem weiteren &lt;a href=&quot;/2020/07/31/ansible-labs&quot;&
         <description>
 </description>
         <pubDate>Sat, 08 Feb 2020 00:00:00 +0000</pubDate>
-        <link>https://dongiovanni83.github.io/lerndokumentation//2020/02/08/ansible-labs/</link>
-        <guid isPermaLink="true">https://dongiovanni83.github.io/lerndokumentation//2020/02/08/ansible-labs/</guid>
+        <link>https://dongiovanni83.github.io/lerndokumentation/lerndokumentation/2020/02/08/ansible-labs/</link>
+        <guid isPermaLink="true">https://dongiovanni83.github.io/lerndokumentation/lerndokumentation/2020/02/08/ansible-labs/</guid>
         
         <category>Ansible</category>
         
