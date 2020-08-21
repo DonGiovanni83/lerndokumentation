@@ -1,6 +1,5 @@
 # Site/SEO settings
 email: bertagna@puzzle.ch
-baseurl: ""
 permalink: /:year/:month/:day/:title/
 google_analytics:
 

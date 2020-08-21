@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: Deploy to github pages
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
@@ -27,8 +27,19 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
 
-      - name: Build & Deploy to GitHub Pages
-        uses: DavidS/jekyll-deploy@master
-        env:
-          JEKYLL_ENV: production
-          GH_PAGES_TOKEN: ${{ secrets.GH_PAGES_TOKEN }}
+      - name: jekyll-deploy
+        description: 'Builds and deploys a jekyll page to GitHub pages'
+        branding:
+          icon: 'send'
+          color: 'gray-dark'
+        runs:
+          using: 'docker'
+          image: 'deploy/Dockerfile'
+          inputs:
+            build-only:
+              description: 'Set to "true" to only build, but not deploy. This is useful for PR testing'
+              required: false
+              default: "false"
+          env:
+            JEKYLL_ENV: production
+            GH_PAGES_TOKEN: ${{ secrets.GH_PAGES_TOKEN }}

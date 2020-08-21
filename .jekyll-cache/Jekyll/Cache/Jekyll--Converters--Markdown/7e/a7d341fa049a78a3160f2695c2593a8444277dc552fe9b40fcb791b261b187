@@ -1,0 +1,24 @@
+I";<p>Als Einstieg in die Way-Up Lehre bei Puzzle, hat das interne Sys-Team /sys-labs vorbereitet,
+welche die Grundlagen der Informatik behandeln und den Lernenden auf grundlegende Tätigkeiten eines Systemadminsitrator bei Puzzle vorberetet. Diese Labs setzen keine Linux-Vorkenntnisse voraus, deshalb waren einige der Lab-Kapitel wiederholung für mich da ich schon Grundkenntnisse über Linux mitbringe. Trotz meiner Vorkenntnissen gab es immer wieder
+interessante Ergänzungen und Hintergrund-Infos. Hier einige /sys-labs konnte ich verschiedene Bereiche einlesen und einarbeiten:</p>
+
+<h2 id="1_commandline">1_commandline</h2>
+
+<p>Das erste Kapitel hat die Grundlagen der Linux Kommandozeile abgedekt. Angefangen mit grundlegenden Befehlen wie sich z.B. in der Ordnerstruktur zu bewegen oder files erstellen und verschieben geht das Kapitel zu etwas aufregenderen Tasks wie z.B. suchen von Files oder Ordner mit Regex ausdrücken.</p>
+
+<p>Weiter wurden im Kapitel Streams STDOUT STDIN und STDERR angeschaut. Hier war interessant zu sehen wie man die einzelnen Streams unabhängig von einander umleiten kann und auch mittels dem Pipeoperators komplexe Anreihungen von Befehlen bilden kann.</p>
+
+<h2 id="2_git">2_git</h2>
+<p>Das Versionierungstool git wir im Nächsten Kapitel vorgestellt. Dieses Tool war mir nicht unbekannt, da ich bereits</p>
+
+<h2 id="3_troubleshooting">3_troubleshooting</h2>
+<p>Dieses</p>
+
+<h2 id="4_ansible">4_ansible</h2>
+<p>Um verschiedene Infrastrukturen automatisiert aufzusetzen und verwalten, wird bei Puzzle Ansible eingesetzt. Deshalb gehören die ansible-labs auch zur Grundausbildung eines Systemtechniker bei Puzzle. Mehr dazu, was ich in den ansible-labs
+lernen konnte in einem weiteren <a href="/2020/07/31/ansible-labs">Post</a>.</p>
+
+<h2 id="5_scripting">5_scripting</h2>
+
+<h2 id="6_networking">6_networking</h2>
+:ET

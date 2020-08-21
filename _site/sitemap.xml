@@ -30,9 +30,6 @@
 <loc>http://localhost:4000/subscribe/</loc>
 </url>
 <url>
-<loc>http://localhost:4000/</loc>
-</url>
-<url>
 <loc>http://localhost:4000/tag/ansible/</loc>
 </url>
 <url>
