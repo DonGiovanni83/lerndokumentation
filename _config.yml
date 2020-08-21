@@ -1,5 +1,6 @@
 # Site/SEO settings
 email: bertagna@puzzle.ch
+baseurl: "lerndokumentation"
 permalink: /:year/:month/:day/:title/
 google_analytics:
 
