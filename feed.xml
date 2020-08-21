@@ -5,9 +5,9 @@
     <description>Dokunentation meiner Ausbildung bei Puzzle ITC zum Systemtechniker EFZ.</description>
     <link>https://dongiovanni83.github.io/lerndokumentation/</link>
     <atom:link href="https://dongiovanni83.github.io/lerndokumentation//feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 21 Aug 2020 18:50:17 +0000</pubDate>
-    <lastBuildDate>Fri, 21 Aug 2020 18:50:17 +0000</lastBuildDate>
-    <generator>Jekyll v3.8.7</generator>
+    <pubDate>Fri, 21 Aug 2020 19:01:56 +0000</pubDate>
+    <lastBuildDate>Fri, 21 Aug 2020 19:01:56 +0000</lastBuildDate>
+    <generator>Jekyll v4.1.1</generator>
     
       <item>
         <title>Ubuntu-20.04 - User-Setup mit Ansible</title>
@@ -32,7 +32,7 @@
 
 &lt;p&gt;In einem Container soll eine Prometheus Server Instanz laufen, welche metrics von einem weiteren Container holen soll. Dieser Container ist ein Linux System mit dem Node Exporeter drauf welcher Prometheus daten zur verfügung stellt. Grafana soll in einem dritten Container laufen, wo dann der Prometheus Container als Data Source registriert werden soll, und in einem Dashboard die Daten visualisiert werden sollen.&lt;/p&gt;
 
-&lt;p&gt;Im &lt;code class=&quot;highlighter-rouge&quot;&gt;docker-compose.yml&lt;/code&gt; file sieht das Ganze wie folgt aus.&lt;/p&gt;
+&lt;p&gt;Im &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;docker-compose.yml&lt;/code&gt; file sieht das Ganze wie folgt aus.&lt;/p&gt;
 
 &lt;div class=&quot;language-yml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;version&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;3'&lt;/span&gt;
 &lt;span class=&quot;na&quot;&gt;services&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
