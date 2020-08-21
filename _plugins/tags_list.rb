@@ -11,6 +11,7 @@ module Jekyll
         @order_by = "asc"
         @sort_by = "count"
         @limit = 0
+        @baseurl = ""
         parse_params
       end
 
@@ -44,7 +45,7 @@ module Jekyll
           if tag_count > @limit && @limit != 0
             break
           end
-          html << "<li><a class=\"footer__link\" href=\"/tag/#{tag.downcase.strip.gsub(' ', '-').gsub(/[^\w-]/, '')}\">#{tag.split.map(&:capitalize)*' '}</a></li>"
+          html << "<li><a class=\"footer__link\" href=\"#{@baseurl}/tag/#{tag.downcase.strip.gsub(' ', '-').gsub(/[^\w-]/, '')}\">#{tag.split.map(&:capitalize)*' '}</a></li>"
           tag_count = tag_count + 1
         end
 

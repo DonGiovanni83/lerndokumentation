@@ -13,10 +13,10 @@ system_or_fail('bundle', 'config', 'set', 'deployment', 'true')
 system_or_fail('bundle', 'install', '--jobs=4', '--retry=3')
 
 if ENV['INPUT_BUILD-ONLY'] == "true"
-  system_or_fail('bundle', 'exec', 'jekyll', 'build', '--future', '--verbose', '--trace', '--config', '_config.yml', '_config.prod.yml')
+  system_or_fail('bundle', 'exec', 'jekyll', 'build', '--future', '--verbose', '--trace', '--config', '_config.prod.yml', '_config.yml')
   exit
 else
-  system_or_fail('bundle', 'exec', 'jekyll', 'build', '--verbose', '--trace', '--config', '_config.yml', '_config.prod.yml')
+  system_or_fail('bundle', 'exec', 'jekyll', 'build', '--verbose', '--trace', '--config', '_config.prod.yml', '_config.yml')
 end
 
 Dir.chdir('_site')
