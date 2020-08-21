@@ -1,0 +1,12 @@
+---
+layout: post
+title: "Ubuntu-20.04 - User-Setup mit Ansible"
+date: 2020-08-21
+description:
+image: /assets/images/pubuntu.png
+author: Fabio Bertagna
+tags:
+  - Ansible
+  - Ubuntu
+  - Linux
+---
