@@ -26,12 +26,12 @@
 {% endif %}
 <meta property="twitter:image" content="{% if page.image %}{{ page.image | absolute_url }}{% else %}{{ site.default_img | absolute_url }}{% endif %}">
 
-<link rel="icon" type="image/x-icon" href="{{ '/assets/images/favicon.ico' | prepend: site.baseurl }}">
+<link rel="icon" type="image/x-icon" href="{{ '/assets/images/favicon.ico' | relative_url }}">
 
-<link rel="stylesheet" href="{{ '/assets/css/app.min.css' | prepend: site.baseurl }}">
+<link rel="stylesheet" href="{{ '/assets/css/app.min.css' | relative_url }}">
 
-<link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="{{ '/feed.xml' | prepend: site.baseurl }}">
-<link rel="canonical" href="{{ page.url | replace: 'index.html', '' | prepend: site.baseurl }}">
+<link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="{{ '/feed.xml' | relative_url }}">
+<link rel="canonical" href="{{ page.url | replace: 'index.html', '' | relative_url }}">
 
 {% if site.google_analytics %}
   <script>
