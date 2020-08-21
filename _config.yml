@@ -1,13 +1,12 @@
 # Site/SEO settings
 email: bertagna@puzzle.ch
-baseurl: "lerndokumentation"
-permalink: /:year/:month/:day/:title/
+permalink: /lerndokumentation/:year/:month/:day/:title/
 google_analytics:
+
 
 name: Fabio Bertagna
 title: Way-Up 2020-2022
 description: Dokunentation meiner Ausbildung bei Puzzle ITC zum Systemtechniker EFZ.
-url: https://dongiovanni83.github.io/
 
 # Author settings
 author:
