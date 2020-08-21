@@ -5,13 +5,11 @@
     <hr class="sep--white"/>
 
     <div class="footer__container">
-      {% tags_list :threshold => 1, :sort_by => count, :order_by => desc, :limit => 5 %}
+      {% tags_list :threshold => 1, :sort_by => count, :order_by => desc, :limit => 5 , :baseurl =>  %}
 
     </div>
   </div>
 </footer>
-
-{% include contact.html %}
 
 {% if paginator.next_page %}
   <script>
@@ -19,4 +17,4 @@
   </script>
 {% endif %}
 
-<script src="{{ '/assets/js/app.min.js' | prepend: site.baseurl }}"></script>
+<script src="{{ '/assets/js/app.min.js' | absolute_url }}"></script>
