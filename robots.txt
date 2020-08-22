@@ -1,1 +1,1 @@
-Sitemap: https://dongiovanni83.github.io/lerndokumentation/sitemap.xml
+Sitemap: /lerndokumentation/sitemap.xml
