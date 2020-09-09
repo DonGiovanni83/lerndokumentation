@@ -5,8 +5,8 @@
     <description>Dokunentation meiner Ausbildung bei Puzzle ITC zum Systemtechniker EFZ.</description>
     <link></link>
     <atom:link href="/lerndokumentation/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 09 Sep 2020 14:21:29 +0000</pubDate>
-    <lastBuildDate>Wed, 09 Sep 2020 14:21:29 +0000</lastBuildDate>
+    <pubDate>Wed, 09 Sep 2020 14:27:04 +0000</pubDate>
+    <lastBuildDate>Wed, 09 Sep 2020 14:27:04 +0000</lastBuildDate>
     <generator>Jekyll v4.1.1</generator>
     
       <item>
@@ -110,7 +110,7 @@ interessante Ergänzungen und Hintergrund-Infos. Hier einige /sys-labs konnte ic
 
 &lt;h2 id=&quot;4_ansible&quot;&gt;4_ansible&lt;/h2&gt;
 &lt;p&gt;Um verschiedene Infrastrukturen automatisiert aufzusetzen und verwalten, wird bei Puzzle Ansible eingesetzt. Deshalb gehören die ansible-labs auch zur Grundausbildung eines Systemtechniker bei Puzzle. Mehr dazu, was ich in den ansible-labs
-lernen konnte in einem weiteren &lt;a href=&quot;/2020/07/31/ansible-labs&quot;&gt;Post&lt;/a&gt;.&lt;/p&gt;
+lernen konnte in einem weiteren &lt;a href=&quot;//lerndokumentation/2020/07/31/ansible-labs&quot;&gt;Post&lt;/a&gt;.&lt;/p&gt;
 
 &lt;h2 id=&quot;5_scripting&quot;&gt;5_scripting&lt;/h2&gt;
 
