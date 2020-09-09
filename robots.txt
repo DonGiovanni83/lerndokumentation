@@ -1,1 +1,1 @@
-Sitemap: /sitemap.xml
+Sitemap: /lerndokumentation/sitemap.xml
