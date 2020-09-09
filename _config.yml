@@ -55,5 +55,9 @@ exclude:
   - Gemfile.lock
   - gulpfile.js
   - package.json
-  - README.md
+  - package-lock.json
+  - THEME_README.md
   - vendor
+  - Dockerfile
+  - action.yml
+  - entrypoint.rb

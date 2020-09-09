@@ -6,6 +6,7 @@
   "scripts": {
     "start": "bundle exec jekyll serve --config _config.yml _config.dev.yml",
     "build": "bundle exec jekyll build",
+    "clean": "bundle exec jekyll clean",
     "deploy": "gulp build && bundle exec jekyll build --config _config.yml _config.prod.yml && s3-website deploy _site",
     "gulp": "gulp"
   },
