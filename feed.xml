@@ -5,8 +5,8 @@
     <description>Dokunentation meiner Ausbildung bei Puzzle ITC zum Systemtechniker EFZ.</description>
     <link></link>
     <atom:link href="/lerndokumentation/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 09 Sep 2020 14:27:04 +0000</pubDate>
-    <lastBuildDate>Wed, 09 Sep 2020 14:27:04 +0000</lastBuildDate>
+    <pubDate>Wed, 09 Sep 2020 15:48:22 +0000</pubDate>
+    <lastBuildDate>Wed, 09 Sep 2020 15:48:22 +0000</lastBuildDate>
     <generator>Jekyll v4.1.1</generator>
     
       <item>
@@ -28,7 +28,7 @@
     
       <item>
         <title>Playing with Prometheus</title>
-        <description>&lt;p&gt;Nach der Theorie zu Prometheus und Grafana in den &lt;a href=&quot;/2020/07/24/sys-labs&quot;&gt;/sys-labs&lt;/a&gt; habe ich diese beiden Technologien in einem ganz einfachen Docker-Setup zusammen gespannt, um diese mal in der Praxis auszuprobieren und damit rum zu spielen.&lt;/p&gt;
+        <description>&lt;p&gt;Nach der Theorie zu Prometheus und Grafana in den &lt;a href=&quot;/lerndokumentation/2020/07/24/sys-labs&quot;&gt;/sys-labs&lt;/a&gt; habe ich diese beiden Technologien in einem ganz einfachen Docker-Setup zusammen gespannt, um diese mal in der Praxis auszuprobieren und damit rum zu spielen.&lt;/p&gt;
 
 &lt;p&gt;In einem Container soll eine Prometheus Server Instanz laufen, welche metrics von einem weiteren Container holen soll. Dieser Container ist ein Linux System mit dem Node Exporeter drauf welcher Prometheus daten zur verfügung stellt. Grafana soll in einem dritten Container laufen, wo dann der Prometheus Container als Data Source registriert werden soll, und in einem Dashboard die Daten visualisiert werden sollen.&lt;/p&gt;
 
@@ -77,7 +77,7 @@
 
 &lt;p&gt;Mit diesem Setup hatte ich die Möglichkeit verschiedenes auszuprobieren und lernen, wie z.B. das registrieren einer Data Source bei Grafana, das Erstellen oder Importieren eines Dashboards auch in Grafana oder auch Queries über den Prometheus Server auf die Targets abzusetzen.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/images/grafana-dashboard.png&quot; alt=&quot;Grafana Dashboard&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/lerndokumentation/assets/images/grafana-dashboard.png&quot; alt=&quot;Grafana Dashboard&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Bei diesem kleinen Experiment war nicht nur spannend zu sehen wie Prometheus und Grafana zusammen funktionieren, sondern auch das Konfigurieren der Docker-Container. Dabei war es wichtig die Container über die benötigten Ports erreichbar für die Anderen zu machen, damit jeder Container seine benötigten Informationen beim jeweiligen Container abholen kann.&lt;/p&gt;
 </description>
@@ -110,7 +110,7 @@ interessante Ergänzungen und Hintergrund-Infos. Hier einige /sys-labs konnte ic
 
 &lt;h2 id=&quot;4_ansible&quot;&gt;4_ansible&lt;/h2&gt;
 &lt;p&gt;Um verschiedene Infrastrukturen automatisiert aufzusetzen und verwalten, wird bei Puzzle Ansible eingesetzt. Deshalb gehören die ansible-labs auch zur Grundausbildung eines Systemtechniker bei Puzzle. Mehr dazu, was ich in den ansible-labs
-lernen konnte in einem weiteren &lt;a href=&quot;//lerndokumentation/2020/07/31/ansible-labs&quot;&gt;Post&lt;/a&gt;.&lt;/p&gt;
+lernen konnte in einem weiteren &lt;a href=&quot;/lerndokumentation/2020/07/31/ansible-labs&quot;&gt;Post&lt;/a&gt;.&lt;/p&gt;
 
 &lt;h2 id=&quot;5_scripting&quot;&gt;5_scripting&lt;/h2&gt;
 
