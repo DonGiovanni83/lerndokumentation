@@ -22,6 +22,7 @@
 
 <link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="{{ '/feed.xml' | prepend: site.baseurl }}">
 <link rel="canonical" href="{{ page.url | replace: 'index.html', '' | relative_url }}">
+<base href="{{ site.baseurl }}/" />
 
 {% if site.google_analytics %}
   <script>
