@@ -26,7 +26,7 @@ Dieses
 
 ## 4_ansible
 Um verschiedene Infrastrukturen automatisiert aufzusetzen und verwalten, wird bei Puzzle Ansible eingesetzt. Deshalb gehören die ansible-labs auch zur Grundausbildung eines Systemtechniker bei Puzzle. Mehr dazu, was ich in den ansible-labs
-lernen konnte in einem weiteren [Post](/2020/07/31/ansible-labs).
+lernen konnte in einem weiteren [Post]({{ site.baseurl }}/2020/07/31/ansible-labs).
 
 ## 5_scripting
 

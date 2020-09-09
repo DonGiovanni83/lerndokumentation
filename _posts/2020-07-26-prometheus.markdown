@@ -8,7 +8,7 @@ author: Fabio Bertagna
 tags:
   - Prometheus
 ---
-Nach der Theorie zu Prometheus und Grafana in den [/sys-labs](/2020/07/24/sys-labs) habe ich diese beiden Technologien in einem ganz einfachen Docker-Setup zusammen gespannt, um diese mal in der Praxis auszuprobieren und damit rum zu spielen.
+Nach der Theorie zu Prometheus und Grafana in den [/sys-labs]({{ site.baseurl }}/2020/07/24/sys-labs) habe ich diese beiden Technologien in einem ganz einfachen Docker-Setup zusammen gespannt, um diese mal in der Praxis auszuprobieren und damit rum zu spielen.
 
 In einem Container soll eine Prometheus Server Instanz laufen, welche metrics von einem weiteren Container holen soll. Dieser Container ist ein Linux System mit dem Node Exporeter drauf welcher Prometheus daten zur verfügung stellt. Grafana soll in einem dritten Container laufen, wo dann der Prometheus Container als Data Source registriert werden soll, und in einem Dashboard die Daten visualisiert werden sollen.
 
@@ -58,6 +58,6 @@ services:
 
 Mit diesem Setup hatte ich die Möglichkeit verschiedenes auszuprobieren und lernen, wie z.B. das registrieren einer Data Source bei Grafana, das Erstellen oder Importieren eines Dashboards auch in Grafana oder auch Queries über den Prometheus Server auf die Targets abzusetzen.
 
-![Grafana Dashboard](/assets/images/grafana-dashboard.png)
+![Grafana Dashboard]({{ site.baseurl }}/assets/images/grafana-dashboard.png)
 
 Bei diesem kleinen Experiment war nicht nur spannend zu sehen wie Prometheus und Grafana zusammen funktionieren, sondern auch das Konfigurieren der Docker-Container. Dabei war es wichtig die Container über die benötigten Ports erreichbar für die Anderen zu machen, damit jeder Container seine benötigten Informationen beim jeweiligen Container abholen kann.
