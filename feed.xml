@@ -5,8 +5,8 @@
     <description>Dokunentation meiner Ausbildung bei Puzzle ITC zum Systemtechniker EFZ.</description>
     <link></link>
     <atom:link href="/lerndokumentation/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 23 Sep 2020 16:01:42 +0000</pubDate>
-    <lastBuildDate>Wed, 23 Sep 2020 16:01:42 +0000</lastBuildDate>
+    <pubDate>Wed, 23 Sep 2020 16:05:12 +0000</pubDate>
+    <lastBuildDate>Wed, 23 Sep 2020 16:05:12 +0000</lastBuildDate>
     <generator>Jekyll v4.1.1</generator>
     
       <item>
@@ -18,6 +18,21 @@
         <guid isPermaLink="true">/lerndokumentation/2020/08/21/ubuntu-20.04-user-setup-mit-ansible/</guid>
         
         <category>Ansible</category>
+        
+        <category>Ubuntu</category>
+        
+        <category>Linux</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>Ubuntu 20.04 - Bootable USB Key mit preseed</title>
+        <description>
+</description>
+        <pubDate>Tue, 04 Aug 2020 00:00:00 +0000</pubDate>
+        <link>/lerndokumentation/2020/08/04/ubuntu-20.04-usb-preseed/</link>
+        <guid isPermaLink="true">/lerndokumentation/2020/08/04/ubuntu-20.04-usb-preseed/</guid>
         
         <category>Ubuntu</category>
         
@@ -272,21 +287,6 @@ Der Shortcut könnte Beispielsweise so aussehen:&lt;/p&gt;
         <pubDate>Fri, 24 Jul 2020 00:00:00 +0000</pubDate>
         <link>/lerndokumentation/2020/07/24/sys-labs/</link>
         <guid isPermaLink="true">/lerndokumentation/2020/07/24/sys-labs/</guid>
-        
-        <category>Linux</category>
-        
-        
-      </item>
-    
-      <item>
-        <title>Ubuntu 20.04 - Bootable USB Key mit preseed</title>
-        <description>
-</description>
-        <pubDate>Sat, 08 Feb 2020 00:00:00 +0000</pubDate>
-        <link>/lerndokumentation/2020/02/08/ubuntu-20.04-usb-preseed/</link>
-        <guid isPermaLink="true">/lerndokumentation/2020/02/08/ubuntu-20.04-usb-preseed/</guid>
-        
-        <category>Ubuntu</category>
         
         <category>Linux</category>
         
