@@ -7,27 +7,189 @@ image: /assets/images/tux.png
 author: Fabio Bertagna
 tags:
   - Linux
+handlungskompetenzen:
+  -
 ---
-Als Einstieg in die Way-Up Lehre bei Puzzle, hat das interne Sys-Team /sys-labs vorbereitet,
-welche die Grundlagen der Informatik behandeln und den Lernenden auf grundlegende Tätigkeiten eines Systemadminsitrator bei Puzzle vorberetet. Diese Labs setzen keine Linux-Vorkenntnisse voraus, deshalb waren einige der Lab-Kapitel wiederholung für mich da ich schon Grundkenntnisse über Linux mitbringe. Trotz meiner Vorkenntnissen gab es immer wieder
-interessante Ergänzungen und Hintergrund-Infos. Hier einige /sys-labs konnte ich verschiedene Bereiche einlesen und einarbeiten:
+Als Einstieg in die Way-Up Lehre bei Puzzle, hat das interne Sys-Team /sys-labs
+vorbereitet, welche die Grundlagen der Informatik behandeln und den Lernenden
+auf grundlegende Tätigkeiten eines Systemadminsitrator bei Puzzle vorberetet.
+Diese Labs setzen keine Linux-Vorkenntnisse voraus, deshalb waren einige der
+Lab-Kapitel wiederholung für mich da ich schon Grundkenntnisse über Linux
+mitbringe. Trotz meiner Vorkenntnissen gab es immer wieder interessante
+Ergänzungen und Hintergrund-Infos. Hier einige /sys-labs konnte ich verschiedene
+Bereiche einlesen und einarbeiten:
 
 ## 1_commandline
 
-Das erste Kapitel hat die Grundlagen der Linux Kommandozeile abgedekt. Angefangen mit grundlegenden Befehlen wie sich z.B. in der Ordnerstruktur zu bewegen oder files erstellen und verschieben geht das Kapitel zu etwas aufregenderen Tasks wie z.B. suchen von Files oder Ordner mit Regex ausdrücken.
+Das erste Kapitel hat die Grundlagen der Linux Kommandozeile abgedekt.
+Angefangen mit grundlegenden Befehlen wie sich z.B. in der Ordnerstruktur zu
+bewegen oder files erstellen und verschieben geht das Kapitel zu etwas
+aufregenderen Tasks wie z.B. suchen von Files oder Ordner mit Regex ausdrücken.
 
-Weiter wurden im Kapitel Streams STDOUT STDIN und STDERR angeschaut. Hier war interessant zu sehen wie man die einzelnen Streams unabhängig von einander umleiten kann und auch mittels dem Pipeoperators komplexe Anreihungen von Befehlen bilden kann.
+Weiter wurden im Kapitel Streams STDOUT STDIN und STDERR angeschaut. Hier war
+interessant zu sehen wie man die einzelnen Streams unabhängig von einander
+umleiten kann und auch mittels dem Pipeoperators komplexe Anreihungen von
+Befehlen bilden kann.
 
 ## 2_git
-Das Versionierungstool git wir im Nächsten Kapitel vorgestellt. Dieses Tool war mir nicht unbekannt, da ich bereits
+Das Versionierungstool git wir im Nächsten Kapitel vorgestellt. Da mir dieses
+Tool bereits vertraut ist, war im Kapitel zu Beginn vieles Repetition.
+Neu dazulernen durfte ich die Art und Weise wie sich Git von anderen
+Versionsverwaltungstools unerscheidet beim
 
 ## 3_troubleshooting
-Dieses
+
 
 ## 4_ansible
-Um verschiedene Infrastrukturen automatisiert aufzusetzen und verwalten, wird bei Puzzle Ansible eingesetzt. Deshalb gehören die ansible-labs auch zur Grundausbildung eines Systemtechniker bei Puzzle. Mehr dazu, was ich in den ansible-labs
-lernen konnte in einem weiteren [Post]({{ site.baseurl }}/2020/07/31/ansible-labs).
+Um verschiedene Infrastrukturen automatisiert aufzusetzen und verwalten, wird
+bei Puzzle Ansible eingesetzt. Deshalb gehören die ansible-labs auch zur
+Grundausbildung eines Systemtechniker bei Puzzle. Mehr dazu, was ich in den
+ansible-labs lernen konnte in einem weiteren [Post]({{ site.baseurl }}/2020/07/31/ansible-labs).
 
 ## 5_scripting
+Als Teil der sys-labs ist in diesem Kapitel angedacht das Skripten mit Bash zu
+erlernen. Da aber die Unterlagen dieses Kapitels noch nicht bestehen, konnte ich
+mit eigenen Skripts Lernen Bash auf meinem Ubuntu anzuwenden.
+
+Dazu habe ich einerseits während den Tests für das Puzzle-Ubuntu-Setup ein Skript
+geschrieben, welches ein Ubuntu-Image baut mit preseed und andererseits, da ich
+mit drei Monitoren arbeite, ein kleines Skript zum Einstellen der
+Bildschirmhelligkeit aller Monitoren. Das Skript zum Puzzle-Ubuntu-Setup erkläre
+ich in diesem [Post]({{site.baseurl}}/2020/08/04/ubuntu-20.04-usb-preseed).
+
+Mein Anforderung an das Skript `brightness-controller` war es, ja nach Parameter den man dem Skript
+übergibt, alle mit dem Laptop verbundenen Displays heller oder dunkler zu machen.
+Dazu habe ich als Erstes den Mechanismus implementier welcher überprüft, dass
+das Skript richtig verwendet wird. Konkret heist das: Das Skript muss mit genau
+einem Parameter ausgeführt werden. Ansonsten wird die Ausführung abgebrochen.
+
+```bash
+if [ "$#" -ne 1 ]; then
+  echo "brightness-controller requires only one parameter"
+  exit
+fi
+```
+
+Nach dieser Überprüfung soll der `brightness-controller` alle am System
+angeschlossenen Displays auslesen und in einem assoziativen Array Speichern.
+Darin sollen jeweils die ID auf die aktuelle Helligkeit der Displays gemapt
+werden.
+
+```bash
+# Deklarieren des Arrays der Displays
+declare -A displays
+
+# Auslesen und verarbeiten der Display IDs
+for DISP in $(xrandr -q | grep " connected" | cut -d' ' -f1)
+do
+  # Auslesen der momentanen Helligkeit von DISP
+  displays[$DISP]="$(bc -l <<< "$(xrandr --verbose | grep $DISP -A5 | tail -1 | cut -f2 -d ' ' ) * 10")"
+
+  # Optional zum Debuggen
+  # echo "display: $DISP"
+  # echo "brightness: ${displays[$DISP]}"
+done
+
+```
+
+Sind die Display IDs und ihre aktuelle Helligkeit gespeichert, ist als Nächstes
+zu überprüfen was für ein Parameter dem Skript mitgegeben wurde. Der
+`brightness-controller` soll nur `up` und `down` als Parameter akzeptieren. Also
+überprüfen wir das als Nächstes:
+
+```bash
+
+INPUT_COMMAND="$1"
+
+# check if input parameter is valid
+case "$INPUT_COMMAND" in
+  up)
+    ...
+    exit
+    ;;
+  down)
+    ...
+    exit
+    ;;
+  *)
+    echo "Invalid parameter - only valid parameters are 'up' or 'down'"
+esac
+
+```
+
+Hier können wir nun das Erhöhen oder Verringern der Bildschirmhelligkeit
+implementieren. Mit dem tool xrandr, das wir zum Auslesen der Geräte ID
+verwendet haben, können wir auch die Helligkeit der Bildschirme einstellen.
+Hierbei ist einzig zu beachten, dass die Helligkeit zwischen 0 und 10.0 sein
+muss:
+
+```bash
+
+...
+
+  up)
+    # Iteriere durch alle Displays im Array
+    for DISP in "${!displays[@]}"
+    do
+      VAL="${displays[$DISP]}"
+      # echo $VAL
+
+      # Falls die Helligkeit grösser gleich 10 ist
+      # setze sie auf 10
+      if [[ "${VAL%.*}" -ge 10 ]]; then
+        VAL=10
+      # ansonsten + 1
+      else
+        VAL="$(bc -l <<< "$VAL + 1")"
+      fi
+
+      # echo "current VAL: $VAL"
+
+      # Schreibe die Helligkeit auf DISP
+      xrandr --output $DISP --brightness "$(bc -l <<< "$VAL / 10")"
+
+    done
+    exit
+    ;;
+
+...
+
+```
+
+Für `down` kann es analog implementiert werden. Hier ist nur der
+Wertebereich der Helligkeit anders zu überprüfen und dementsprechend
+zu setzen:
+
+```bash
+
+...
+
+      if [[ "${VAL%.*}" -le 0 ]]; then
+        VAL=0
+      else
+        VAL="$(bc -l <<< "$VAL - 1")"
+      fi
+
+...
+
+```
+
+Nun kann das Skript ausgeführt werden mit dem gewünschten Parameter und die
+Bildschirme sollten ihre Helligkeit dementsprechend anpassen.
+
+Damit das Skript nun nicht jedes Mal aus einem Terminal ausgeführt werden
+muss, habe ich im Ubuntu 20.04 zwei Keyboard-Shortcuts welche das Skript
+mit den Parametern `up` oder `down` ausführen.
+
+Dazu kann man über die Gnome Einstellungen öffnen und danach entweder über
+die Suche oder im Menu in die Sektion _Keyboard Shortucuts_ navigieren.
+Scrollt man in der Liste bis ganz nach unten, kann nun einen Custom Shortcut
+hinzufügen. Hier kann man nun dem Shortcut einen sinnvollen Namen vergeben wie
+zum Beispiel _Increase brightness_ und in der zweiten Option _Command_ den Pfad
+zu dem `brightness-controller` Skript und den gewünschten Parameter angeben.
+Der Shortcut könnte Beispielsweise so aussehen:
+
+![Custom keyboard shortcut]({{ site.baseurl }}/assets/images/custom-keyboard-shortcut.png)
+
 
 ## 6_networking

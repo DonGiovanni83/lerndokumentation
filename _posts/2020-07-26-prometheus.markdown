@@ -60,4 +60,4 @@ Mit diesem Setup hatte ich die Möglichkeit verschiedenes auszuprobieren und ler
 
 ![Grafana Dashboard]({{ site.baseurl }}/assets/images/grafana-dashboard.png)
 
-Bei diesem kleinen Experiment war nicht nur spannend zu sehen wie Prometheus und Grafana zusammen funktionieren, sondern auch das Konfigurieren der Docker-Container. Dabei war es wichtig die Container über die benötigten Ports erreichbar für die Anderen zu machen, damit jeder Container seine benötigten Informationen beim jeweiligen Container abholen kann.
+Bei diesem kleinen Experiment war nicht nur spannend zu sehen wie Prometheus und Grafana zusammen funktionieren, sondern auch das Konfigurieren der Docker-Container. Dabei war es wichtig die Container über die benötigten Ports füreinander erreichbar machen, damit jeder Container seine benötigten Informationen beim jeweiligen Container abholen kann.

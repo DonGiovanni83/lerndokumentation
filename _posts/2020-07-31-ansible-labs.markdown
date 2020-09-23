@@ -7,4 +7,6 @@ image: /assets/images/ansible-logo.png
 author: Fabio Bertagna
 tags:
   - Ansible
+
 ---
+Als Einstieg in Ansible hat Puzzle hausgemachte Ansible Techlabs. 
