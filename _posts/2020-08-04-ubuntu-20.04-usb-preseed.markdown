@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Ubuntu 20.04 - Bootable USB Key mit preseed"
-date: 2020-02-08
+date: 2020-08-04
 description:
 image: /assets/images/ubuntu-preseed.png
 author: Fabio Bertagna
@@ -9,4 +9,3 @@ tags:
   - Ubuntu
   - Linux
 ---
-  
