@@ -5,8 +5,8 @@
     <description>Dokunentation meiner Ausbildung bei Puzzle ITC zum Systemtechniker EFZ.</description>
     <link></link>
     <atom:link href="/lerndokumentation/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 23 Sep 2020 02:13:05 +0000</pubDate>
-    <lastBuildDate>Wed, 23 Sep 2020 02:13:05 +0000</lastBuildDate>
+    <pubDate>Wed, 23 Sep 2020 16:01:42 +0000</pubDate>
+    <lastBuildDate>Wed, 23 Sep 2020 16:01:42 +0000</lastBuildDate>
     <generator>Jekyll v4.1.1</generator>
     
       <item>
@@ -79,7 +79,7 @@
 
 &lt;p&gt;&lt;img src=&quot;/lerndokumentation/assets/images/grafana-dashboard.png&quot; alt=&quot;Grafana Dashboard&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;Bei diesem kleinen Experiment war nicht nur spannend zu sehen wie Prometheus und Grafana zusammen funktionieren, sondern auch das Konfigurieren der Docker-Container. Dabei war es wichtig die Container über die benötigten Ports erreichbar für die Anderen zu machen, damit jeder Container seine benötigten Informationen beim jeweiligen Container abholen kann.&lt;/p&gt;
+&lt;p&gt;Bei diesem kleinen Experiment war nicht nur spannend zu sehen wie Prometheus und Grafana zusammen funktionieren, sondern auch das Konfigurieren der Docker-Container. Dabei war es wichtig die Container über die benötigten Ports füreinander erreichbar machen, damit jeder Container seine benötigten Informationen beim jeweiligen Container abholen kann.&lt;/p&gt;
 </description>
         <pubDate>Sun, 26 Jul 2020 00:00:00 +0000</pubDate>
         <link>/lerndokumentation/2020/07/26/prometheus/</link>
@@ -92,27 +92,180 @@
     
       <item>
         <title>/sys-labs</title>
-        <description>&lt;p&gt;Als Einstieg in die Way-Up Lehre bei Puzzle, hat das interne Sys-Team /sys-labs vorbereitet,
-welche die Grundlagen der Informatik behandeln und den Lernenden auf grundlegende Tätigkeiten eines Systemadminsitrator bei Puzzle vorberetet. Diese Labs setzen keine Linux-Vorkenntnisse voraus, deshalb waren einige der Lab-Kapitel wiederholung für mich da ich schon Grundkenntnisse über Linux mitbringe. Trotz meiner Vorkenntnissen gab es immer wieder
-interessante Ergänzungen und Hintergrund-Infos. Hier einige /sys-labs konnte ich verschiedene Bereiche einlesen und einarbeiten:&lt;/p&gt;
+        <description>&lt;p&gt;Als Einstieg in die Way-Up Lehre bei Puzzle, hat das interne Sys-Team /sys-labs
+vorbereitet, welche die Grundlagen der Informatik behandeln und den Lernenden
+auf grundlegende Tätigkeiten eines Systemadminsitrator bei Puzzle vorberetet.
+Diese Labs setzen keine Linux-Vorkenntnisse voraus, deshalb waren einige der
+Lab-Kapitel wiederholung für mich da ich schon Grundkenntnisse über Linux
+mitbringe. Trotz meiner Vorkenntnissen gab es immer wieder interessante
+Ergänzungen und Hintergrund-Infos. Hier einige /sys-labs konnte ich verschiedene
+Bereiche einlesen und einarbeiten:&lt;/p&gt;
 
 &lt;h2 id=&quot;1_commandline&quot;&gt;1_commandline&lt;/h2&gt;
 
-&lt;p&gt;Das erste Kapitel hat die Grundlagen der Linux Kommandozeile abgedekt. Angefangen mit grundlegenden Befehlen wie sich z.B. in der Ordnerstruktur zu bewegen oder files erstellen und verschieben geht das Kapitel zu etwas aufregenderen Tasks wie z.B. suchen von Files oder Ordner mit Regex ausdrücken.&lt;/p&gt;
+&lt;p&gt;Das erste Kapitel hat die Grundlagen der Linux Kommandozeile abgedekt.
+Angefangen mit grundlegenden Befehlen wie sich z.B. in der Ordnerstruktur zu
+bewegen oder files erstellen und verschieben geht das Kapitel zu etwas
+aufregenderen Tasks wie z.B. suchen von Files oder Ordner mit Regex ausdrücken.&lt;/p&gt;
 
-&lt;p&gt;Weiter wurden im Kapitel Streams STDOUT STDIN und STDERR angeschaut. Hier war interessant zu sehen wie man die einzelnen Streams unabhängig von einander umleiten kann und auch mittels dem Pipeoperators komplexe Anreihungen von Befehlen bilden kann.&lt;/p&gt;
+&lt;p&gt;Weiter wurden im Kapitel Streams STDOUT STDIN und STDERR angeschaut. Hier war
+interessant zu sehen wie man die einzelnen Streams unabhängig von einander
+umleiten kann und auch mittels dem Pipeoperators komplexe Anreihungen von
+Befehlen bilden kann.&lt;/p&gt;
 
 &lt;h2 id=&quot;2_git&quot;&gt;2_git&lt;/h2&gt;
-&lt;p&gt;Das Versionierungstool git wir im Nächsten Kapitel vorgestellt. Dieses Tool war mir nicht unbekannt, da ich bereits&lt;/p&gt;
+&lt;p&gt;Das Versionierungstool git wir im Nächsten Kapitel vorgestellt. Da mir dieses
+Tool bereits vertraut ist, war im Kapitel zu Beginn vieles Repetition.
+Neu dazulernen durfte ich die Art und Weise wie sich Git von anderen
+Versionsverwaltungstools unerscheidet beim&lt;/p&gt;
 
 &lt;h2 id=&quot;3_troubleshooting&quot;&gt;3_troubleshooting&lt;/h2&gt;
-&lt;p&gt;Dieses&lt;/p&gt;
 
 &lt;h2 id=&quot;4_ansible&quot;&gt;4_ansible&lt;/h2&gt;
-&lt;p&gt;Um verschiedene Infrastrukturen automatisiert aufzusetzen und verwalten, wird bei Puzzle Ansible eingesetzt. Deshalb gehören die ansible-labs auch zur Grundausbildung eines Systemtechniker bei Puzzle. Mehr dazu, was ich in den ansible-labs
-lernen konnte in einem weiteren &lt;a href=&quot;/lerndokumentation/2020/07/31/ansible-labs&quot;&gt;Post&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Um verschiedene Infrastrukturen automatisiert aufzusetzen und verwalten, wird
+bei Puzzle Ansible eingesetzt. Deshalb gehören die ansible-labs auch zur
+Grundausbildung eines Systemtechniker bei Puzzle. Mehr dazu, was ich in den
+ansible-labs lernen konnte in einem weiteren &lt;a href=&quot;/lerndokumentation/2020/07/31/ansible-labs&quot;&gt;Post&lt;/a&gt;.&lt;/p&gt;
 
 &lt;h2 id=&quot;5_scripting&quot;&gt;5_scripting&lt;/h2&gt;
+&lt;p&gt;Als Teil der sys-labs ist in diesem Kapitel angedacht das Skripten mit Bash zu
+erlernen. Da aber die Unterlagen dieses Kapitels noch nicht bestehen, konnte ich
+mit eigenen Skripts Lernen Bash auf meinem Ubuntu anzuwenden.&lt;/p&gt;
+
+&lt;p&gt;Dazu habe ich einerseits während den Tests für das Puzzle-Ubuntu-Setup ein Skript
+geschrieben, welches ein Ubuntu-Image baut mit preseed und andererseits, da ich
+mit drei Monitoren arbeite, ein kleines Skript zum Einstellen der
+Bildschirmhelligkeit aller Monitoren. Das Skript zum Puzzle-Ubuntu-Setup erkläre
+ich in diesem &lt;a href=&quot;/lerndokumentation/2020/08/04/ubuntu-20.04-usb-preseed&quot;&gt;Post&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Mein Anforderung an das Skript &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;brightness-controller&lt;/code&gt; war es, ja nach Parameter den man dem Skript
+übergibt, alle mit dem Laptop verbundenen Displays heller oder dunkler zu machen.
+Dazu habe ich als Erstes den Mechanismus implementier welcher überprüft, dass
+das Skript richtig verwendet wird. Konkret heist das: Das Skript muss mit genau
+einem Parameter ausgeführt werden. Ansonsten wird die Ausführung abgebrochen.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;$#&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-ne&lt;/span&gt; 1 &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then
+  &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;brightness-controller requires only one parameter&quot;&lt;/span&gt;
+  &lt;span class=&quot;nb&quot;&gt;exit
+&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;fi&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Nach dieser Überprüfung soll der &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;brightness-controller&lt;/code&gt; alle am System
+angeschlossenen Displays auslesen und in einem assoziativen Array Speichern.
+Darin sollen jeweils die ID auf die aktuelle Helligkeit der Displays gemapt
+werden.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# Deklarieren des Arrays der Displays&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;declare&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-A&lt;/span&gt; displays
+
+&lt;span class=&quot;c&quot;&gt;# Auslesen und verarbeiten der Display IDs&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;DISP &lt;span class=&quot;k&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;xrandr &lt;span class=&quot;nt&quot;&gt;-q&lt;/span&gt; | &lt;span class=&quot;nb&quot;&gt;grep&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot; connected&quot;&lt;/span&gt; | &lt;span class=&quot;nb&quot;&gt;cut&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;' '&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-f1&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+  &lt;span class=&quot;c&quot;&gt;# Auslesen der momentanen Helligkeit von DISP&lt;/span&gt;
+  displays[&lt;span class=&quot;nv&quot;&gt;$DISP&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;bc &lt;span class=&quot;nt&quot;&gt;-l&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;xrandr &lt;span class=&quot;nt&quot;&gt;--verbose&lt;/span&gt; | &lt;span class=&quot;nb&quot;&gt;grep&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$DISP&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-A5&lt;/span&gt; | &lt;span class=&quot;nb&quot;&gt;tail&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; | &lt;span class=&quot;nb&quot;&gt;cut&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-f2&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;' '&lt;/span&gt; &lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt; * 10&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+
+  &lt;span class=&quot;c&quot;&gt;# Optional zum Debuggen&lt;/span&gt;
+  &lt;span class=&quot;c&quot;&gt;# echo &quot;display: $DISP&quot;&lt;/span&gt;
+  &lt;span class=&quot;c&quot;&gt;# echo &quot;brightness: ${displays[$DISP]}&quot;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;done&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Sind die Display IDs und ihre aktuelle Helligkeit gespeichert, ist als Nächstes
+zu überprüfen was für ein Parameter dem Skript mitgegeben wurde. Der
+&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;brightness-controller&lt;/code&gt; soll nur &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;up&lt;/code&gt; und &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;down&lt;/code&gt; als Parameter akzeptieren. Also
+überprüfen wir das als Nächstes:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
+&lt;span class=&quot;nv&quot;&gt;INPUT_COMMAND&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$1&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;# check if input parameter is valid&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$INPUT_COMMAND&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;in
+  &lt;/span&gt;up&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    ...
+    &lt;span class=&quot;nb&quot;&gt;exit&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;;;&lt;/span&gt;
+  down&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    ...
+    &lt;span class=&quot;nb&quot;&gt;exit&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;;;&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Invalid parameter - only valid parameters are 'up' or 'down'&quot;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;esac&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Hier können wir nun das Erhöhen oder Verringern der Bildschirmhelligkeit
+implementieren. Mit dem tool xrandr, das wir zum Auslesen der Geräte ID
+verwendet haben, können wir auch die Helligkeit der Bildschirme einstellen.
+Hierbei ist einzig zu beachten, dass die Helligkeit zwischen 0 und 10.0 sein
+muss:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
+...
+
+  up&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;# Iteriere durch alle Displays im Array&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;DISP &lt;span class=&quot;k&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;!displays[@]&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;do
+      &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;VAL&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;displays&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$DISP&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+      &lt;span class=&quot;c&quot;&gt;# echo $VAL&lt;/span&gt;
+
+      &lt;span class=&quot;c&quot;&gt;# Falls die Helligkeit grösser gleich 10 ist&lt;/span&gt;
+      &lt;span class=&quot;c&quot;&gt;# setze sie auf 10&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[[&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;VAL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;%.*&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-ge&lt;/span&gt; 10 &lt;span class=&quot;o&quot;&gt;]]&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then
+        &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;VAL&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;10
+      &lt;span class=&quot;c&quot;&gt;# ansonsten + 1&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;else
+        &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;VAL&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;bc &lt;span class=&quot;nt&quot;&gt;-l&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$VAL&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt; + 1&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;fi&lt;/span&gt;
+
+      &lt;span class=&quot;c&quot;&gt;# echo &quot;current VAL: $VAL&quot;&lt;/span&gt;
+
+      &lt;span class=&quot;c&quot;&gt;# Schreibe die Helligkeit auf DISP&lt;/span&gt;
+      xrandr &lt;span class=&quot;nt&quot;&gt;--output&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$DISP&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--brightness&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;bc &lt;span class=&quot;nt&quot;&gt;-l&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$VAL&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt; / 10&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;done
+    &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;exit&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;;;&lt;/span&gt;
+
+...
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Für &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;down&lt;/code&gt; kann es analog implementiert werden. Hier ist nur der
+Wertebereich der Helligkeit anders zu überprüfen und dementsprechend
+zu setzen:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
+...
+
+      &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[[&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;VAL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;%.*&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-le&lt;/span&gt; 0 &lt;span class=&quot;o&quot;&gt;]]&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then
+        &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;VAL&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;0
+      &lt;span class=&quot;k&quot;&gt;else
+        &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;VAL&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;bc &lt;span class=&quot;nt&quot;&gt;-l&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$VAL&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt; - 1&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;fi&lt;/span&gt;
+
+...
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Nun kann das Skript ausgeführt werden mit dem gewünschten Parameter und die
+Bildschirme sollten ihre Helligkeit dementsprechend anpassen.&lt;/p&gt;
+
+&lt;p&gt;Damit das Skript nun nicht jedes Mal aus einem Terminal ausgeführt werden
+muss, habe ich im Ubuntu 20.04 zwei Keyboard-Shortcuts welche das Skript
+mit den Parametern &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;up&lt;/code&gt; oder &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;down&lt;/code&gt; ausführen.&lt;/p&gt;
+
+&lt;p&gt;Dazu kann man über die Gnome Einstellungen öffnen und danach entweder über
+die Suche oder im Menu in die Sektion &lt;em&gt;Keyboard Shortucuts&lt;/em&gt; navigieren.
+Scrollt man in der Liste bis ganz nach unten, kann nun einen Custom Shortcut
+hinzufügen. Hier kann man nun dem Shortcut einen sinnvollen Namen vergeben wie
+zum Beispiel &lt;em&gt;Increase brightness&lt;/em&gt; und in der zweiten Option &lt;em&gt;Command&lt;/em&gt; den Pfad
+zu dem &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;brightness-controller&lt;/code&gt; Skript und den gewünschten Parameter angeben.
+Der Shortcut könnte Beispielsweise so aussehen:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/lerndokumentation/assets/images/custom-keyboard-shortcut.png&quot; alt=&quot;Custom keyboard shortcut&quot; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&quot;6_networking&quot;&gt;6_networking&lt;/h2&gt;
 </description>
@@ -142,7 +295,7 @@ lernen konnte in einem weiteren &lt;a href=&quot;/lerndokumentation/2020/07/31/a
     
       <item>
         <title>ansible-labs</title>
-        <description>
+        <description>&lt;p&gt;Als Einstieg in Ansible hat Puzzle hausgemachte Ansible Techlabs.&lt;/p&gt;
 </description>
         <pubDate>Sat, 08 Feb 2020 00:00:00 +0000</pubDate>
         <link>/lerndokumentation/2020/02/08/ansible-labs/</link>
