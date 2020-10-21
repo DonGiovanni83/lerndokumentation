@@ -5,8 +5,8 @@
     <description>Dokunentation meiner Ausbildung bei Puzzle ITC zum Systemtechniker EFZ.</description>
     <link></link>
     <atom:link href="/lerndokumentation/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 21 Oct 2020 14:32:02 +0000</pubDate>
-    <lastBuildDate>Wed, 21 Oct 2020 14:32:02 +0000</lastBuildDate>
+    <pubDate>Wed, 21 Oct 2020 14:35:04 +0000</pubDate>
+    <lastBuildDate>Wed, 21 Oct 2020 14:35:04 +0000</lastBuildDate>
     <generator>Jekyll v4.1.1</generator>
     
       <item>
@@ -27,7 +27,7 @@ funktionierte und anschliessend alle Schritte vom PXE-Boot bis zum Ansible-Setup
 &lt;p&gt;Mit allen Neuerungen und Anpassungen kann das bestehende Setup in folgenden Schritten abgebildet werden, welche ich 
 anschliessend noch etwas genauer beschreiben werde, zusammenfasst werden:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/images/pubuntu-setup-diagram.png&quot; alt=&quot;Pubuntu Setup Diagramm&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/lerndokumentation/assets/images/pubuntu-setup-diagram.png&quot; alt=&quot;Pubuntu Setup Diagramm&quot; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&quot;1-pxe-boot--install-mit-preseed&quot;&gt;1. PXE Boot &amp;amp; Install mit preseed&lt;/h2&gt;
 
