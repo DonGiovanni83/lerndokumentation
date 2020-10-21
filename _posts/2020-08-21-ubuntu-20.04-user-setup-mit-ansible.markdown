@@ -13,27 +13,42 @@ tags:
 
 Bei Puzzle ITC wird standardmässig Ubuntu als Betriebssystem eingesetzt. Bezieht ein Member ein neues
 Notebook, erhält sie oder er ein Notebook mit einem Ubuntu welches den Puzzle-Bedürfnissen entsprechend vorkonfiguriert
-ist. Dazu gehören zum Beispiel ein vorkonfiguriertes VPN, bereits installierte Druckertreiber und Drucker, Wifi schon
-eingerichtet, Adminzugriff für den Support sowie auch einen Puzzle-Brand-Touch am Gnome.
+ist. Dazu gehören zum Beispiel ein vorkonfiguriertes VPN, bereits installierte Druckertreiber und Drucker, internes Wifi schon
+eingerichtet, Adminzugriff für den Support, Netzwerk shares eingerichtet sowie auch einen Puzzle-Brand-Touch am Gnome.
 
-Bestehend war das Staging Setup für Ubuntu 18.04 LTS. Über den internen PXE Server konnte man das Ubuntu 18.04 LTS Image
-und einige preseed-Files beziehen welche den Installationsvorgang automatisieren sollten sowie auch nach dem ersten
-Einloggen des neuen Users weitere Puzzle-Konfigurationen mit Ansible Infolge des Ubuntu LTS-Update
-auf 20.04. war mein Auftrag das Setup der neuen Betriebssystem-Version anzupassen und, so weit möglich, zu vereinfachen.
+Bestehend war das Staging-Setup für Ubuntu 18.04 LTS. Über den internen PXE Server konnte man das Ubuntu 18.04 LTS Image
+und einige preseed-Files beziehen, welche den Installationsvorgang automatisieren sollten, sowie auch nach dem ersten
+Einloggen des neuen Users weitere Puzzle-Konfigurations-Prozesse mit Ansible-Pull triggerten. Nun war mein Auftrag, infolge des Ubuntu LTS-Update
+auf 20.04. das Setup der neuen Betriebssystem-Version anzupassen und, so weit möglich, zu vereinfachen.
 
-Dazu habe ich erstmals mich mit dem bestehenden Setup auseinandersetzen müssen, um zu sehen wie das ganze zurzeit
+Dazu habe ich mich erstmals mit dem bestehenden Setup auseinandersetzen müssen, um zu sehen wie das Ganze zurzeit
 funktionierte und anschliessend alle Schritte vom PXE-Boot bis zum Ansible-Setup dem neuen Betriebssystem anpassen.
 
 Mit allen Neuerungen und Anpassungen kann das bestehende Setup in folgenden Schritten abgebildet werden, welche ich 
 anschliessend noch etwas genauer beschreiben werde, zusammenfasst werden:
 
 
-![Pubuntu Setup Diagramm](/assets/images/pubuntu-setup-diagram.png)
+![Pubuntu Setup Diagramm]({{ site.base_url  }}/assets/images/pubuntu-setup-diagram.png)
 
 
 ## 1. PXE Boot & Install mit preseed
 
-Ist ein Notebook am internen Netz angeschlossen, kann vom internen Puzzle-PXE-Server die Ganze OS-'Menukarte' vom Notebook
-abgiefragt werden. 
+Ist ein Notebook am internen Netz angeschlossen, kann vom internen Puzzle-PXE-Server die Ganze OS-'Menukarte' vom aus Notebook
+abgiefragt werden. In diesem Menu existiert für das Ubuntu-20.04-Setup folgende Auswahl:
+
+```
+...
+menu PXE Boot Options
+...
+item pubuntu-net-20.04 Puzzle Ubuntu 20.04 installation
+...
+
+:pubuntu-net-20.04
+set base-url http://archive.ubuntu.com/ubuntu/dists/focal-updates/main/installer-amd64/current/legacy-images/netboot/ubuntu-installer/amd64
+kernel ${base-url}/linux
+initrd ${base-url}/initrd.gz
+imgargs linux initrd=initrd.gz auto=true fb=false priority=critical preseed/locale=en_US kbd-chooser/method=ch keymap=ch debian-installer/keymap=ch preseed/url=http://{{ ansible_default_ipv4.address }}/pubuntu.seed
+boot ||  
+```
 
 ## 2. 
