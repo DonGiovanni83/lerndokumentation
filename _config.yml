@@ -61,3 +61,6 @@ exclude:
   - Dockerfile
   - action.yml
   - entrypoint.rb
+sass:
+    sass_dir: _assets/scss
+    style: compressed

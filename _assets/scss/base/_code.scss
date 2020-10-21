@@ -17,7 +17,7 @@ pre {
   padding: 2em 0.75em;
 
   line-height: 1.8;
-  white-space: pre-wrap;
+  // white-space: pre-wrap;
   word-wrap: break-word;
   color: $color-black;
   background: $color-lightgrey;
@@ -32,8 +32,6 @@ pre {
   }
 
   #markdown & {
-    margin-bottom: 1.5rem;
-
     @media (min-width: $mq-med) {
       min-width: 110%;
     }

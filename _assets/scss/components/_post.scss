@@ -227,6 +227,14 @@
     display: none;
   }
 
+
+  > div {
+    margin-bottom: 1.5rem;   
+    overflow-x: scroll;
+    max-width: 100%;
+    align-self: start;
+  }
+  
   img {
     display: block;
     margin-bottom: 1.5rem;
