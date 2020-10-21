@@ -5,23 +5,23 @@
     <description>Dokunentation meiner Ausbildung bei Puzzle ITC zum Systemtechniker EFZ.</description>
     <link></link>
     <atom:link href="/lerndokumentation/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 21 Oct 2020 14:29:48 +0000</pubDate>
-    <lastBuildDate>Wed, 21 Oct 2020 14:29:48 +0000</lastBuildDate>
+    <pubDate>Wed, 21 Oct 2020 14:32:02 +0000</pubDate>
+    <lastBuildDate>Wed, 21 Oct 2020 14:32:02 +0000</lastBuildDate>
     <generator>Jekyll v4.1.1</generator>
     
       <item>
         <title>Ubuntu-20.04 - User-Setup mit Ansible</title>
         <description>&lt;p&gt;Bei Puzzle ITC wird standardmässig Ubuntu als Betriebssystem eingesetzt. Bezieht ein Member ein neues
 Notebook, erhält sie oder er ein Notebook mit einem Ubuntu welches den Puzzle-Bedürfnissen entsprechend vorkonfiguriert
-ist. Dazu gehören zum Beispiel ein vorkonfiguriertes VPN, bereits installierte Druckertreiber und Drucker, Wifi schon
-eingerichtet, Adminzugriff für den Support sowie auch einen Puzzle-Brand-Touch am Gnome.&lt;/p&gt;
+ist. Dazu gehören zum Beispiel ein vorkonfiguriertes VPN, bereits installierte Druckertreiber und Drucker, internes Wifi schon
+eingerichtet, Adminzugriff für den Support, Netzwerk shares eingerichtet sowie auch einen Puzzle-Brand-Touch am Gnome.&lt;/p&gt;
 
-&lt;p&gt;Bestehend war das Staging Setup für Ubuntu 18.04 LTS. Über den internen PXE Server konnte man das Ubuntu 18.04 LTS Image
-und einige preseed-Files beziehen welche den Installationsvorgang automatisieren sollten sowie auch nach dem ersten
-Einloggen des neuen Users weitere Puzzle-Konfigurationen mit Ansible Infolge des Ubuntu LTS-Update
-auf 20.04. war mein Auftrag das Setup der neuen Betriebssystem-Version anzupassen und, so weit möglich, zu vereinfachen.&lt;/p&gt;
+&lt;p&gt;Bestehend war das Staging-Setup für Ubuntu 18.04 LTS. Über den internen PXE Server konnte man das Ubuntu 18.04 LTS Image
+und einige preseed-Files beziehen, welche den Installationsvorgang automatisieren sollten, sowie auch nach dem ersten
+Einloggen des neuen Users weitere Puzzle-Konfigurations-Prozesse mit Ansible-Pull triggerten. Nun war mein Auftrag, infolge des Ubuntu LTS-Update
+auf 20.04. das Setup der neuen Betriebssystem-Version anzupassen und, so weit möglich, zu vereinfachen.&lt;/p&gt;
 
-&lt;p&gt;Dazu habe ich erstmals mich mit dem bestehenden Setup auseinandersetzen müssen, um zu sehen wie das ganze zurzeit
+&lt;p&gt;Dazu habe ich mich erstmals mit dem bestehenden Setup auseinandersetzen müssen, um zu sehen wie das Ganze zurzeit
 funktionierte und anschliessend alle Schritte vom PXE-Boot bis zum Ansible-Setup dem neuen Betriebssystem anpassen.&lt;/p&gt;
 
 &lt;p&gt;Mit allen Neuerungen und Anpassungen kann das bestehende Setup in folgenden Schritten abgebildet werden, welche ich 
@@ -31,8 +31,22 @@ anschliessend noch etwas genauer beschreiben werde, zusammenfasst werden:&lt;/p&
 
 &lt;h2 id=&quot;1-pxe-boot--install-mit-preseed&quot;&gt;1. PXE Boot &amp;amp; Install mit preseed&lt;/h2&gt;
 
-&lt;p&gt;Ist ein Notebook am internen Netz angeschlossen, kann vom internen Puzzle-PXE-Server die Ganze OS-‘Menukarte’ vom Notebook
-abgiefragt werden.&lt;/p&gt;
+&lt;p&gt;Ist ein Notebook am internen Netz angeschlossen, kann vom internen Puzzle-PXE-Server die Ganze OS-‘Menukarte’ vom aus Notebook
+abgiefragt werden. In diesem Menu existiert für das Ubuntu-20.04-Setup folgende Auswahl:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;...
+menu PXE Boot Options
+...
+item pubuntu-net-20.04 Puzzle Ubuntu 20.04 installation
+...
+
+:pubuntu-net-20.04
+set base-url http://archive.ubuntu.com/ubuntu/dists/focal-updates/main/installer-amd64/current/legacy-images/netboot/ubuntu-installer/amd64
+kernel ${base-url}/linux
+initrd ${base-url}/initrd.gz
+imgargs linux initrd=initrd.gz auto=true fb=false priority=critical preseed/locale=en_US kbd-chooser/method=ch keymap=ch debian-installer/keymap=ch preseed/url=http:///pubuntu.seed
+boot ||  
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;h2 id=&quot;2&quot;&gt;2.&lt;/h2&gt;
 </description>
