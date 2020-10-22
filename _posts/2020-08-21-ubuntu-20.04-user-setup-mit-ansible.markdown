@@ -36,6 +36,7 @@ anschliessend noch etwas genauer beschreiben werde, zusammenfasst werden:
 Ist ein Notebook am internen Netz angeschlossen, kann vom internen Puzzle-PXE-Server die Ganze OS-'Menukarte' vom aus Notebook
 abgiefragt werden. In diesem Menu existiert für das Ubuntu-20.04-Setup folgende Auswahl:
 
+
 ```
 ...
 menu PXE Boot Options
@@ -47,8 +48,248 @@ item pubuntu-net-20.04 Puzzle Ubuntu 20.04 installation
 set base-url http://archive.ubuntu.com/ubuntu/dists/focal-updates/main/installer-amd64/current/legacy-images/netboot/ubuntu-installer/amd64
 kernel ${base-url}/linux
 initrd ${base-url}/initrd.gz
-imgargs linux initrd=initrd.gz auto=true fb=false priority=critical preseed/locale=en_US kbd-chooser/method=ch keymap=ch debian-installer/keymap=ch preseed/url=http://{{ ansible_default_ipv4.address }}/pubuntu.seed
+imgargs linux initrd=initrd.gz auto=true fb=false priority=critical preseed/locale=en_US kbd-chooser/method=ch keymap=ch debian-installer/keymap=ch preseed/url=http://{{ ansible_default.address }}/pubuntu.seed
 boot ||  
+
 ```
 
-## 2. 
+Was nun bei der Auswahl von `:pubuntu-net-20.04` geschieht ist, dass das aktuelle Netboot-Installer aus dem Ubuntu-Archiv
+heruntergeladen und mit den oben aufgelisteten `imgargs` ausgeführt. Wichtig ist hierbei des letzte Argument `preseed/url`.
+Mit diesem Argument wird der Pfad zur Preseed-Datei angegeben, welche wir gleich genauer anschauen werden.
+
+Wurde der Netboot-Installer geladen, startet der debian-installer und die Installation beginnt. Normalerweise würd man an diesem
+Punkt auf Konfigurationsfragen wie z.B. Tastatur-Layout, Netzwerk, Festplatten-Partitionierung und Verschlüsselung, Sprache
+oder Benutzereinrichtung. Da aber die ganze Installation automatisiert sein soll, verwenden wir das oben erwähnte Preseed-File. Diese
+Datei enthält alle Antworten auf die Fragen, welche der debian-installer während der Installation fragen wird plus noch einige 
+Extra-Befehle die am Schluss der Installation ausgeführt werden um die Installation auf unsere Puzzle-Wünsche anzupassen.
+
+Wie ein solches Preseed-File ausswhen kann und wie man es zusammenstellt ist wird [hier](https://help.ubuntu.com/lts/installation-guide/s390x/apb.html) in der Ubuntu Dokumentation erklärt. Wichtig für unser Setup aber ist besonders diese Voreinstellung der Installation:
+
+```
+d-i preseed/late_command string \
+  modprobe nfs ;\
+  mkdir /target/mnt/pubuntu /target/root/scripts ;\
+  mount -t nfs -o port=2049,nolock,proto=tcp {{ ipxe_server_addr }}:/nfs/netboot/pubuntu /target/mnt/pubuntu ;\
+  in-target rsync -av --progress /mnt/pubuntu/preseed/scripts/ /root/scripts/ ;\
+  chmod +x /target/root/scripts/oem-setup.sh ;\
+  chmod +x /target/root/scripts/user-setup.sh ;\
+  chmod +x /target/root/scripts/wifi.sh ;\
+  in-target /root/scripts/oem-setup.sh preseed
+
+```
+
+Für unser automatisiertes Setup ist der letzte Befehtl `preseed/late_command` besonders wichtig. Was hier geschieht ist, dass
+nach der Ubuntu Installation die nach dem `string` aufgeführten Befehle im neu installierten Betriebssystem ausgeführt werden.
+In unserem Fall möchten wir am Schluss der Installation ein script `oem-setup.sh` ausführen. Dafür muss dieses Skript zuerst 
+im neuen System vorhanden und ausführbar vorliegen. Die ersten drei Befehle mounten den iPXE-Server von Puzzle und kopieren
+anschliessend das `oem-setup.sh`-Skript sowie 2 weitere Skripts welche vom `oem-setup.sh` benötigt werden auf das System.
+Diese werden anschliessend ausführbar gemacht, und zuletzt wird das `oem-setup.sh`-Skript `in-target` oder im kontext des
+neuen Betriebssystems (d.h. nicht im debian-installer) ausgeführt.
+
+Dieses Skript bringt uns in die Nächste Phase, das OEM-Setup von Ubuntu für Puzzle-Members.
+
+
+## 2. OEM-Setup
+
+Das Betriebssystem ist bereit, hat jedoch noch keine Benutzer. Das soll auch so bleiben, bis die Member das Notebook das erste
+Mal in Empfang nehmen. Um nun Voreinstellungen vorzunehmen ohne selber zuerst einen User erstellen und anschliessend wieder
+löschen zu müssen, verwenden wir den OEM-Mode. Hierbei wird der OEM-User erstellt, welchen wir benutzen, um alle Einstellungen
+vorzunehmen, welche die Puzzle-Members bei einem neuen Notebook out-of-the-box vorfinden sollten. Im automatisierten Installations-
+Prozess von Abschnitt 1, packen wir diese Einstellungen, welche der OEM-User vornehmen soll ins `oem-setup.sh`-Skript:
+
+```bash
+#!/bin/bash
+# Runs initial oem user setup after first install.
+
+dir="$(dirname $(readlink -f $0))"
+cd $dir
+
+# write every shell output to terminal
+set -ex
+
+# preseed setup step
+if [ "$1" == "preseed" ]; then
+  mkdir -p /var/log/pubuntu-setup/
+  /bin/bash $dir/oem-setup.sh | tee /var/log/pubuntu-setup/oem-setup.log
+  exit
+else
+  mkdir -p /etc/skel/.config/autostart/
+  cat > /etc/skel/.config/autostart/puzzle-user-setup.desktop <<EOF
+  [Desktop Entry]
+  Type=Application
+  Exec=gnome-terminal -x bash -c "sudo /root/scripts/user-setup.sh start; exec bash;"
+  Hidden=false
+  NoDisplay=false
+  X-GNOME-Autostart-enabled=true
+  Name[en_US]=Puzzle ITC ansible-pull
+  Name=Puzzle ITC ansible-pull
+  Comment[en_US]=OS setup to be triggered after first user login. Should be removed after first execution.
+  Comment=
+EOF
+
+  # Finish OEM setup and trigger 'new-user-boot'
+  oem-config-prepare --quiet
+
+  sleep 3600
+
+  exit
+fi
+
+```
+
+Zuerst wird sichergestellt, dass die Ausführung dieses Skripts geloggt wird (Im System, nicht im Installations-Medium). Anschliessend
+setzt der OEM-User den Ordner `/etc/skel` für das Setup der Members auf. Die Besonderheit an diesem Ordner ist, dass `useradd` standardmässig
+diesen 'Skeleton'- oder Skelett-Ordner beim  Erstellen eines neuen Users um den Home-Directory des neuen Users zu erstellen. D.h. erstellt
+man einen user _bob_ erstellt `useradd` für _bob_ den Home-Ordner `/home/bob` und kopiert alles vom Ordner `/etc/skel` nach `/home/bob`.
+Für unser automatisiertes Setup also sehr praktisch.
+
+Was wir im `/etc/skel` machen, ist das Bash-Skript `user-setup.sh` als Startup-Program dem zukünftigen User hinzuzufügen, damit schon beim ersten
+Login dieses Skript ausgeführt wird.
+
+Ist nun das `oem-setup.sh`-Skript fertig, und der OEM-User nicht mehr gebraucht wird, sorgt der Befehl `oem-config-prerare --quiet`
+dafür, dass beim nächsten Starten des Notebooks, der OEM-User gelöscht wird (inklusive Home-Directory) und der User sich selbst auf dem 
+Gerät registrieren kann.
+
+Mit diesem letzten Befehl ist das Staging des Notebooks abgeschlossen, und der debian-installer fährt das Gerät herunter.
+
+## 3. User-Registrierung
+
+Wird ein gestagtes Notebook deployed, wird der Member beim Aufstarten als Erstes aufgefordert sich als Benuzer zu erfassen.
+
+![Create User]({{ site.baseurl  }}/assets/images/pubuntu-setup-create-user.png)
+
+Hat der Member sich fertig registriert und eingeloggt, wird automatisch das im Abschnitt 2 eingefügte Programm ausgeführt. Dieses Startup-Programm
+führt dieses `user-setup.sh`-Skript aus:
+
+```bash
+#!/bin/bash
+
+# ensure proper logging
+if [ "$1" == "start" ]; then
+  mkdir -p /var/log/pubuntu-setup/
+  /bin/bash /root/scripts/user-setup.sh | tee /var/log/pubuntu-setup/user-setup.log
+  exit
+fi
+
+# check if there are any wifi devices
+if [[ $(iw dev) ]]; then
+  # if so configure wifi
+  echo "Wifi setup"
+  /root/scripts/wifi.sh
+fi
+
+###### PUZZLE ENVIRONMENT ######
+################################
+
+# Install minimal packages:
+apt update -y
+apt install -y \
+  git \
+  vim \
+  curl \
+  xterm \
+  zenity \
+  ansible \
+  metacity \
+  openssh-server \
+  cracklib-runtime
+
+# output from bash in English
+echo 'export LANG=en_US.UTF-8' >> /etc/bash.bashrc
+
+## prepare puzzle-ansible-pull ###
+##################################
+
+mkdir -p /var/lib/ansible/local
+mkdir -p /etc/puzzle-ansible/
+
+cat > /usr/local/bin/puzzle-ansible-pull <<EOF
+#!/bin/bash
+ansible-pull \
+    -d /var/lib/ansible/local \
+    -U git@ssh.gitlab.com:p_itc_sys/ubuntu-ansible \
+    -C master \
+    --key-file /etc/puzzle-ansible/staging_sshkey \
+    --accept-host-key | tee /var/log/puzzle-ansible-pull.logs &&
+
+    # disable user creation on puzzle-ansible-pull
+    sed 's/create_user: true/create_user: false/' /etc/puzzle-ansible/user.yml > /etc/puzzle-ansible/user.yml
+EOF
+
+chmod +x /usr/local/bin/puzzle-ansible-pull
+
+# copy key
+cp /root/scripts/staging_sshkey /etc/puzzle-ansible/staging_sshkey
+chmod 600 /etc/puzzle-ansible/staging_sshkey
+
+# save the installation date
+date +%c > /root/install-date
+
+### ansible-pull ###
+####################
+CURRENT_USER="$(who | awk '{ print $1 }')"
+
+echo "Configuring ansible pull for $CURRENT_USER"
+
+cat > /etc/puzzle-ansible/user.yml <<EOF
+---
+# User configurations will only be applied if this var is set to true
+create_user: true
+
+# The following variables are only used for user configuration
+user:
+    # Username
+    name: $CURRENT_USER
+    # Groupname
+    group: $CURRENT_USER
+    # Ldap-Username
+    ldapname: $CURRENT_USER
+    # Computername
+    hostname: $CURRENT_USER-puzzle
+EOF
+
+/usr/local/bin/puzzle-ansible-pull
+
+# Clean up initial startup job if still exists
+rm -f /home/$CURRENT_USER/.config/autostart/puzzle-user-setup.desktop
+
+read -p "---- Do you want to reboot now (y/n)?" choice
+case "$choice" in
+  y|Y )
+    echo "----------- Rebooting now. See you later! -----------"
+    sleep 2
+    reboot
+    ;;
+  n|N )
+    exit
+    ;;
+  * ) echo "invalid";;
+esac
+
+```
+
+Dieses Skript ist nicht direkt zuständig für die Einrichtung des Notebooks, sondern
+bereitet das Gerät vor für ein ansible-pull, welches die Konfigurationen auf dem Laptop durchführen wird.
+Nach dieser Vorbereitung führt `user-setup.sh` das ansible-pull auch gleich aus.
+
+Wichtig ist auch, das Entfernen des laufenden Skripts aus den Auto-Start-Programmen damit, diese Konfiguration
+beim nächsten Login nicht erneut durchgeführt wird.
+
+
+## 4. Ansible-Pull
+Ansible-Pull wird verwendet um ein remote Ansible-Repo aun Node zu ziehen, wo anschliessend das Repo selbstständig
+z.B. mittels Cron-Job upgedated und ausgeführt werden kann. Genau das passiert auch beim Puzzle-Ubuntu setup.
+Das Ubuntu-Ansible-Repository wird von ansible-pull gepullt und ausgeführt. Hierbei wird folgendes gemacht:
+  
+   - Benötigte Software installieren 
+   - Ungebrauchte Software entfernen 
+   - ansible-pull Cron-Job einrichten 
+   - Den Benutzer durch einen Disk-Verschlüsselungs-Passwort-Wechsel führen
+   - Puzzle-Branding, mit Fonts, Sperrbildschirm-, Hintergrunds- und Boot-Bildern einrichten
+   - User-Backup einrichten
+   - Nextcoud anbindung einrichten
+   - Internes Wifi einrichten
+   - VPN einrichten
+
+Nach diesen Konfigurationsschritten ist das Betriebssystem fertig eingerichtet und das Gerät startet neu.
+

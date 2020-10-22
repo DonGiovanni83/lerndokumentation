@@ -32,7 +32,7 @@ autopages:
   tags:
     layouts:
       - 'tag.html'
-    title: 'The Barber Theme'
+    title: 'Way-Up 2020-2022'
     permalink: '/tag/:tag'
     slugify:
       mode: raw
@@ -40,6 +40,11 @@ autopages:
 
 # Build settings
 markdown: kramdown
+highlighter: rouge 
+kramdown:
+  input: GFM
+  syntax_highlighter_opts:
+    css_class   : 'syntax'
 plugins:
   - jekyll-paginate-v2
   - jekyll-sitemap
@@ -50,7 +55,6 @@ compress_html:
 exclude:
   - node_modules
   - .DS_Store
-  - barber.jpg
   - Gemfile
   - Gemfile.lock
   - gulpfile.js

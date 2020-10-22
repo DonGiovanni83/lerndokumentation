@@ -19,8 +19,7 @@ pre {
   line-height: 1.8;
   // white-space: pre-wrap;
   word-wrap: break-word;
-  color: $color-black;
-  background: $color-lightgrey;
+  background: $color-ultradarkgrey;
   border-radius: 5px;
   overflow: hidden;
 
@@ -43,8 +42,8 @@ pre {
 }
 
 code {
-  padding: 0.25em 0.5em;
-
-  color: $color-black;
-  background: $color-lightgrey;
+  padding: 0.12em 0.36em;
+  font-size: 0.85em;
+  background: $color-ultradarkgrey;
+  color: $color-light-code-font;
 }
