@@ -5,8 +5,8 @@
     <description>Dokunentation meiner Ausbildung bei Puzzle ITC zum Systemtechniker EFZ.</description>
     <link></link>
     <atom:link href="/lerndokumentation/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 22 Oct 2020 02:15:06 +0000</pubDate>
-    <lastBuildDate>Thu, 22 Oct 2020 02:15:06 +0000</lastBuildDate>
+    <pubDate>Thu, 22 Oct 2020 13:24:30 +0000</pubDate>
+    <lastBuildDate>Thu, 22 Oct 2020 13:24:30 +0000</lastBuildDate>
     <generator>Jekyll v4.1.1</generator>
     
       <item>
@@ -34,7 +34,7 @@ anschliessend noch etwas genauer beschreiben werde, zusammenfasst werden:&lt;/p&
 &lt;p&gt;Ist ein Notebook am internen Netz angeschlossen, kann vom internen Puzzle-PXE-Server die Ganze OS-‘Menukarte’ vom aus Notebook
 abgiefragt werden. In diesem Menu existiert für das Ubuntu-20.04-Setup folgende Auswahl:&lt;/p&gt;
 
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;...
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;syntax&quot;&gt;&lt;code&gt;...
 menu PXE Boot Options
 ...
 item pubuntu-net-20.04 Puzzle Ubuntu 20.04 installation
@@ -46,9 +46,246 @@ kernel ${base-url}/linux
 initrd ${base-url}/initrd.gz
 imgargs linux initrd=initrd.gz auto=true fb=false priority=critical preseed/locale=en_US kbd-chooser/method=ch keymap=ch debian-installer/keymap=ch preseed/url=http:///pubuntu.seed
 boot ||  
+
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h2 id=&quot;2&quot;&gt;2.&lt;/h2&gt;
+&lt;p&gt;Was nun bei der Auswahl von &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;:pubuntu-net-20.04&lt;/code&gt; geschieht ist, dass das aktuelle Netboot-Installer aus dem Ubuntu-Archiv
+heruntergeladen und mit den oben aufgelisteten &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;imgargs&lt;/code&gt; ausgeführt. Wichtig ist hierbei des letzte Argument &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;preseed/url&lt;/code&gt;.
+Mit diesem Argument wird der Pfad zur Preseed-Datei angegeben, welche wir gleich genauer anschauen werden.&lt;/p&gt;
+
+&lt;p&gt;Wurde der Netboot-Installer geladen, startet der debian-installer und die Installation beginnt. Normalerweise würd man an diesem
+Punkt auf Konfigurationsfragen wie z.B. Tastatur-Layout, Netzwerk, Festplatten-Partitionierung und Verschlüsselung, Sprache
+oder Benutzereinrichtung. Da aber die ganze Installation automatisiert sein soll, verwenden wir das oben erwähnte Preseed-File. Diese
+Datei enthält alle Antworten auf die Fragen, welche der debian-installer während der Installation fragen wird plus noch einige 
+Extra-Befehle die am Schluss der Installation ausgeführt werden um die Installation auf unsere Puzzle-Wünsche anzupassen.&lt;/p&gt;
+
+&lt;p&gt;Wie ein solches Preseed-File ausswhen kann und wie man es zusammenstellt ist wird &lt;a href=&quot;https://help.ubuntu.com/lts/installation-guide/s390x/apb.html&quot;&gt;hier&lt;/a&gt; in der Ubuntu Dokumentation erklärt. Wichtig für unser Setup aber ist besonders diese Voreinstellung der Installation:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;syntax&quot;&gt;&lt;code&gt;d-i preseed/late_command string \
+  modprobe nfs ;\
+  mkdir /target/mnt/pubuntu /target/root/scripts ;\
+  mount -t nfs -o port=2049,nolock,proto=tcp :/nfs/netboot/pubuntu /target/mnt/pubuntu ;\
+  in-target rsync -av --progress /mnt/pubuntu/preseed/scripts/ /root/scripts/ ;\
+  chmod +x /target/root/scripts/oem-setup.sh ;\
+  chmod +x /target/root/scripts/user-setup.sh ;\
+  chmod +x /target/root/scripts/wifi.sh ;\
+  in-target /root/scripts/oem-setup.sh preseed
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Für unser automatisiertes Setup ist der letzte Befehtl &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;preseed/late_command&lt;/code&gt; besonders wichtig. Was hier geschieht ist, dass
+nach der Ubuntu Installation die nach dem &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;string&lt;/code&gt; aufgeführten Befehle im neu installierten Betriebssystem ausgeführt werden.
+In unserem Fall möchten wir am Schluss der Installation ein script &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;oem-setup.sh&lt;/code&gt; ausführen. Dafür muss dieses Skript zuerst 
+im neuen System vorhanden und ausführbar vorliegen. Die ersten drei Befehle mounten den iPXE-Server von Puzzle und kopieren
+anschliessend das &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;oem-setup.sh&lt;/code&gt;-Skript sowie 2 weitere Skripts welche vom &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;oem-setup.sh&lt;/code&gt; benötigt werden auf das System.
+Diese werden anschliessend ausführbar gemacht, und zuletzt wird das &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;oem-setup.sh&lt;/code&gt;-Skript &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;in-target&lt;/code&gt; oder im kontext des
+neuen Betriebssystems (d.h. nicht im debian-installer) ausgeführt.&lt;/p&gt;
+
+&lt;p&gt;Dieses Skript bringt uns in die Nächste Phase, das OEM-Setup von Ubuntu für Puzzle-Members.&lt;/p&gt;
+
+&lt;h2 id=&quot;2-oem-setup&quot;&gt;2. OEM-Setup&lt;/h2&gt;
+
+&lt;p&gt;Das Betriebssystem ist bereit, hat jedoch noch keine Benutzer. Das soll auch so bleiben, bis die Member das Notebook das erste
+Mal in Empfang nehmen. Um nun Voreinstellungen vorzunehmen ohne selber zuerst einen User erstellen und anschliessend wieder
+löschen zu müssen, verwenden wir den OEM-Mode. Hierbei wird der OEM-User erstellt, welchen wir benutzen, um alle Einstellungen
+vorzunehmen, welche die Puzzle-Members bei einem neuen Notebook out-of-the-box vorfinden sollten. Im automatisierten Installations-
+Prozess von Abschnitt 1, packen wir diese Einstellungen, welche der OEM-User vornehmen soll ins &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;oem-setup.sh&lt;/code&gt;-Skript:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;syntax&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# Runs initial oem user setup after first install.&lt;/span&gt;
+
+&lt;span class=&quot;nb&quot;&gt;dir&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;dirname&lt;/span&gt; &lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;readlink&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$0&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$dir&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;# write every shell output to terminal&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;set&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-ex&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;# preseed setup step&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$1&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;preseed&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then
+  &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;mkdir&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; /var/log/pubuntu-setup/
+  /bin/bash &lt;span class=&quot;nv&quot;&gt;$dir&lt;/span&gt;/oem-setup.sh | &lt;span class=&quot;nb&quot;&gt;tee&lt;/span&gt; /var/log/pubuntu-setup/oem-setup.log
+  &lt;span class=&quot;nb&quot;&gt;exit
+&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;else
+  &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;mkdir&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; /etc/skel/.config/autostart/
+  &lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; /etc/skel/.config/autostart/puzzle-user-setup.desktop &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EOF&lt;/span&gt;&lt;span class=&quot;sh&quot;&gt;
+  [Desktop Entry]
+  Type=Application
+  Exec=gnome-terminal -x bash -c &quot;sudo /root/scripts/user-setup.sh start; exec bash;&quot;
+  Hidden=false
+  NoDisplay=false
+  X-GNOME-Autostart-enabled=true
+  Name[en_US]=Puzzle ITC ansible-pull
+  Name=Puzzle ITC ansible-pull
+  Comment[en_US]=OS setup to be triggered after first user login. Should be removed after first execution.
+  Comment=
+&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EOF
+
+&lt;/span&gt;  &lt;span class=&quot;c&quot;&gt;# Finish OEM setup and trigger 'new-user-boot'&lt;/span&gt;
+  oem-config-prepare &lt;span class=&quot;nt&quot;&gt;--quiet&lt;/span&gt;
+
+  &lt;span class=&quot;nb&quot;&gt;sleep &lt;/span&gt;3600
+
+  &lt;span class=&quot;nb&quot;&gt;exit
+&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;fi&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Zuerst wird sichergestellt, dass die Ausführung dieses Skripts geloggt wird (Im System, nicht im Installations-Medium). Anschliessend
+setzt der OEM-User den Ordner &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/etc/skel&lt;/code&gt; für das Setup der Members auf. Die Besonderheit an diesem Ordner ist, dass &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;useradd&lt;/code&gt; standardmässig
+diesen ‘Skeleton’- oder Skelett-Ordner beim  Erstellen eines neuen Users um den Home-Directory des neuen Users zu erstellen. D.h. erstellt
+man einen user &lt;em&gt;bob&lt;/em&gt; erstellt &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;useradd&lt;/code&gt; für &lt;em&gt;bob&lt;/em&gt; den Home-Ordner &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/home/bob&lt;/code&gt; und kopiert alles vom Ordner &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/etc/skel&lt;/code&gt; nach &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/home/bob&lt;/code&gt;.
+Für unser automatisiertes Setup also sehr praktisch.&lt;/p&gt;
+
+&lt;p&gt;Was wir im &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/etc/skel&lt;/code&gt; machen, ist das Bash-Skript &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;user-setup.sh&lt;/code&gt; als Startup-Program dem zukünftigen User hinzuzufügen, damit schon beim ersten
+Login dieses Skript ausgeführt wird.&lt;/p&gt;
+
+&lt;p&gt;Ist nun das &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;oem-setup.sh&lt;/code&gt;-Skript fertig, und der OEM-User nicht mehr gebraucht wird, sorgt der Befehl &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;oem-config-prerare --quiet&lt;/code&gt;
+dafür, dass beim nächsten Starten des Notebooks, der OEM-User gelöscht wird (inklusive Home-Directory) und der User sich selbst auf dem 
+Gerät registrieren kann.&lt;/p&gt;
+
+&lt;p&gt;Mit diesem letzten Befehl ist das Staging des Notebooks abgeschlossen, und der debian-installer fährt das Gerät herunter.&lt;/p&gt;
+
+&lt;h2 id=&quot;3-user-registrierung&quot;&gt;3. User-Registrierung&lt;/h2&gt;
+
+&lt;p&gt;Wird ein gestagtes Notebook deployed, wird der Member beim Aufstarten als Erstes aufgefordert sich als Benuzer zu erfassen.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/lerndokumentation/assets/images/pubuntu-setup-create-user.png&quot; alt=&quot;Create User&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Hat der Member sich fertig registriert und eingeloggt, wird automatisch das im Abschnitt 2 eingefügte Programm ausgeführt. Dieses Startup-Programm
+führt dieses &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;user-setup.sh&lt;/code&gt;-Skript aus:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;syntax&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#!/bin/bash&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;# ensure proper logging&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$1&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;start&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then
+  &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;mkdir&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; /var/log/pubuntu-setup/
+  /bin/bash /root/scripts/user-setup.sh | &lt;span class=&quot;nb&quot;&gt;tee&lt;/span&gt; /var/log/pubuntu-setup/user-setup.log
+  &lt;span class=&quot;nb&quot;&gt;exit
+&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;fi&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;# check if there are any wifi devices&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[[&lt;/span&gt; &lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;iw dev&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;]]&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then&lt;/span&gt;
+  &lt;span class=&quot;c&quot;&gt;# if so configure wifi&lt;/span&gt;
+  &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Wifi setup&quot;&lt;/span&gt;
+  /root/scripts/wifi.sh
+&lt;span class=&quot;k&quot;&gt;fi&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;###### PUZZLE ENVIRONMENT ######&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;################################&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;# Install minimal packages:&lt;/span&gt;
+apt update &lt;span class=&quot;nt&quot;&gt;-y&lt;/span&gt;
+apt &lt;span class=&quot;nb&quot;&gt;install&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-y&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  git &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  vim &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  curl &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  xterm &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  zenity &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  ansible &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  metacity &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  openssh-server &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  cracklib-runtime
+
+&lt;span class=&quot;c&quot;&gt;# output from bash in English&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'export LANG=en_US.UTF-8'&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; /etc/bash.bashrc
+
+&lt;span class=&quot;c&quot;&gt;## prepare puzzle-ansible-pull ###&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;##################################&lt;/span&gt;
+
+&lt;span class=&quot;nb&quot;&gt;mkdir&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; /var/lib/ansible/local
+&lt;span class=&quot;nb&quot;&gt;mkdir&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; /etc/puzzle-ansible/
+
+&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; /usr/local/bin/puzzle-ansible-pull &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EOF&lt;/span&gt;&lt;span class=&quot;sh&quot;&gt;
+#!/bin/bash
+ansible-pull &lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;&lt;span class=&quot;sh&quot;&gt;
+    -d /var/lib/ansible/local &lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;&lt;span class=&quot;sh&quot;&gt;
+    -U git@ssh.gitlab.com:p_itc_sys/ubuntu-ansible &lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;&lt;span class=&quot;sh&quot;&gt;
+    -C master &lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;&lt;span class=&quot;sh&quot;&gt;
+    --key-file /etc/puzzle-ansible/staging_sshkey &lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;&lt;span class=&quot;sh&quot;&gt;
+    --accept-host-key | tee /var/log/puzzle-ansible-pull.logs &amp;amp;&amp;amp;
+
+    # disable user creation on puzzle-ansible-pull
+    sed 's/create_user: true/create_user: false/' /etc/puzzle-ansible/user.yml &amp;gt; /etc/puzzle-ansible/user.yml
+&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EOF
+
+&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;chmod&lt;/span&gt; +x /usr/local/bin/puzzle-ansible-pull
+
+&lt;span class=&quot;c&quot;&gt;# copy key&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;cp&lt;/span&gt; /root/scripts/staging_sshkey /etc/puzzle-ansible/staging_sshkey
+&lt;span class=&quot;nb&quot;&gt;chmod &lt;/span&gt;600 /etc/puzzle-ansible/staging_sshkey
+
+&lt;span class=&quot;c&quot;&gt;# save the installation date&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;date&lt;/span&gt; +%c &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; /root/install-date
+
+&lt;span class=&quot;c&quot;&gt;### ansible-pull ###&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;####################&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;CURRENT_USER&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;who&lt;/span&gt; | &lt;span class=&quot;nb&quot;&gt;awk&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'{ print $1 }'&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+
+&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Configuring ansible pull for &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$CURRENT_USER&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+
+&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; /etc/puzzle-ansible/user.yml &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EOF&lt;/span&gt;&lt;span class=&quot;sh&quot;&gt;
+---
+# User configurations will only be applied if this var is set to true
+create_user: true
+
+# The following variables are only used for user configuration
+user:
+    # Username
+    name: &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$CURRENT_USER&lt;/span&gt;&lt;span class=&quot;sh&quot;&gt;
+    # Groupname
+    group: &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$CURRENT_USER&lt;/span&gt;&lt;span class=&quot;sh&quot;&gt;
+    # Ldap-Username
+    ldapname: &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$CURRENT_USER&lt;/span&gt;&lt;span class=&quot;sh&quot;&gt;
+    # Computername
+    hostname: &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$CURRENT_USER&lt;/span&gt;&lt;span class=&quot;sh&quot;&gt;-puzzle
+&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EOF
+
+&lt;/span&gt;/usr/local/bin/puzzle-ansible-pull
+
+&lt;span class=&quot;c&quot;&gt;# Clean up initial startup job if still exists&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;rm&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; /home/&lt;span class=&quot;nv&quot;&gt;$CURRENT_USER&lt;/span&gt;/.config/autostart/puzzle-user-setup.desktop
+
+&lt;span class=&quot;nb&quot;&gt;read&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;---- Do you want to reboot now (y/n)?&quot;&lt;/span&gt; choice
+&lt;span class=&quot;k&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$choice&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;in
+  &lt;/span&gt;y|Y &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;----------- Rebooting now. See you later! -----------&quot;&lt;/span&gt;
+    &lt;span class=&quot;nb&quot;&gt;sleep &lt;/span&gt;2
+    reboot
+    &lt;span class=&quot;p&quot;&gt;;;&lt;/span&gt;
+  n|N &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;nb&quot;&gt;exit&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;;;&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;invalid&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;esac&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Dieses Skript ist nicht direkt zuständig für die Einrichtung des Notebooks, sondern
+bereitet das Gerät vor für ein ansible-pull, welches die Konfigurationen auf dem Laptop durchführen wird.
+Nach dieser Vorbereitung führt &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;user-setup.sh&lt;/code&gt; das ansible-pull auch gleich aus.&lt;/p&gt;
+
+&lt;p&gt;Wichtig ist auch, das Entfernen des laufenden Skripts aus den Auto-Start-Programmen damit, diese Konfiguration
+beim nächsten Login nicht erneut durchgeführt wird.&lt;/p&gt;
+
+&lt;h2 id=&quot;4-ansible-pull&quot;&gt;4. Ansible-Pull&lt;/h2&gt;
+&lt;p&gt;Ansible-Pull wird verwendet um ein remote Ansible-Repo aun Node zu ziehen, wo anschliessend das Repo selbstständig
+z.B. mittels Cron-Job upgedated und ausgeführt werden kann. Genau das passiert auch beim Puzzle-Ubuntu setup.
+Das Ubuntu-Ansible-Repository wird von ansible-pull gepullt und ausgeführt. Hierbei wird folgendes gemacht:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Benötigte Software installieren&lt;/li&gt;
+  &lt;li&gt;Ungebrauchte Software entfernen&lt;/li&gt;
+  &lt;li&gt;ansible-pull Cron-Job einrichten&lt;/li&gt;
+  &lt;li&gt;Den Benutzer durch einen Disk-Verschlüsselungs-Passwort-Wechsel führen&lt;/li&gt;
+  &lt;li&gt;Puzzle-Branding, mit Fonts, Sperrbildschirm-, Hintergrunds- und Boot-Bildern einrichten&lt;/li&gt;
+  &lt;li&gt;User-Backup einrichten&lt;/li&gt;
+  &lt;li&gt;Nextcoud anbindung einrichten&lt;/li&gt;
+  &lt;li&gt;Internes Wifi einrichten&lt;/li&gt;
+  &lt;li&gt;VPN einrichten&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Nach diesen Konfigurationsschritten ist das Betriebssystem fertig eingerichtet und das Gerät startet neu.&lt;/p&gt;
+
 </description>
         <pubDate>Fri, 21 Aug 2020 00:00:00 +0000</pubDate>
         <link>/lerndokumentation/2020/08/21/ubuntu-20.04-user-setup-mit-ansible/</link>
@@ -86,7 +323,7 @@ boot ||
 
 &lt;p&gt;Im &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;docker-compose.yml&lt;/code&gt; file sieht das Ganze wie folgt aus.&lt;/p&gt;
 
-&lt;div class=&quot;language-yml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;version&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;3'&lt;/span&gt;
+&lt;div class=&quot;language-yml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;syntax&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;version&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;3'&lt;/span&gt;
 &lt;span class=&quot;na&quot;&gt;services&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;prometheus&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
     &lt;span class=&quot;na&quot;&gt;image&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;prom/prometheus:latest&lt;/span&gt;
@@ -196,7 +433,7 @@ Dazu habe ich als Erstes den Mechanismus implementier welcher überprüft, dass
 das Skript richtig verwendet wird. Konkret heist das: Das Skript muss mit genau
 einem Parameter ausgeführt werden. Ansonsten wird die Ausführung abgebrochen.&lt;/p&gt;
 
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;$#&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-ne&lt;/span&gt; 1 &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;syntax&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;$#&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-ne&lt;/span&gt; 1 &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then
   &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;brightness-controller requires only one parameter&quot;&lt;/span&gt;
   &lt;span class=&quot;nb&quot;&gt;exit
 &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;fi&lt;/span&gt;
@@ -207,7 +444,7 @@ angeschlossenen Displays auslesen und in einem assoziativen Array Speichern.
 Darin sollen jeweils die ID auf die aktuelle Helligkeit der Displays gemapt
 werden.&lt;/p&gt;
 
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# Deklarieren des Arrays der Displays&lt;/span&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;syntax&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# Deklarieren des Arrays der Displays&lt;/span&gt;
 &lt;span class=&quot;nb&quot;&gt;declare&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-A&lt;/span&gt; displays
 
 &lt;span class=&quot;c&quot;&gt;# Auslesen und verarbeiten der Display IDs&lt;/span&gt;
@@ -228,7 +465,7 @@ zu überprüfen was für ein Parameter dem Skript mitgegeben wurde. Der
 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;brightness-controller&lt;/code&gt; soll nur &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;up&lt;/code&gt; und &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;down&lt;/code&gt; als Parameter akzeptieren. Also
 überprüfen wir das als Nächstes:&lt;/p&gt;
 
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;syntax&quot;&gt;&lt;code&gt;
 &lt;span class=&quot;nv&quot;&gt;INPUT_COMMAND&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$1&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
 
 &lt;span class=&quot;c&quot;&gt;# check if input parameter is valid&lt;/span&gt;
@@ -253,7 +490,7 @@ verwendet haben, können wir auch die Helligkeit der Bildschirme einstellen.
 Hierbei ist einzig zu beachten, dass die Helligkeit zwischen 0 und 10.0 sein
 muss:&lt;/p&gt;
 
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;syntax&quot;&gt;&lt;code&gt;
 ...
 
   up&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
@@ -289,7 +526,7 @@ muss:&lt;/p&gt;
 Wertebereich der Helligkeit anders zu überprüfen und dementsprechend
 zu setzen:&lt;/p&gt;
 
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;syntax&quot;&gt;&lt;code&gt;
 ...
 
       &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[[&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;VAL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;%.*&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-le&lt;/span&gt; 0 &lt;span class=&quot;o&quot;&gt;]]&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then

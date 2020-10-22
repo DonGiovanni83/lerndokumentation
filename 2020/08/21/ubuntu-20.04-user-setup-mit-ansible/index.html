@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Ubuntu-20.04 - User-Setup mit Ansible | Way-Up 2020-2022</title><meta name="description" content="Dokunentation meiner Ausbildung bei Puzzle ITC zum Systemtechniker EFZ."><meta itemprop="name" content="Fabio Bertagna"><meta itemprop="description" content="Dokunentation meiner Ausbildung bei Puzzle ITC zum Systemtechniker EFZ."><meta itemprop="image" content="/lerndokumentation/assets/images/pubuntu.png"><meta property="og:url" content="/lerndokumentation/2020/08/21/ubuntu-20.04-user-setup-mit-ansible/"><meta property="og:type" content="website"><meta property="og:title" content="Ubuntu-20.04 - User-Setup mit Ansible | Way-Up 2020-2022"><meta property="og:site_name" content="Way-Up 2020-2022"><meta property="og:description" content="Dokunentation meiner Ausbildung bei Puzzle ITC zum Systemtechniker EFZ."><meta property="og:image" content="/lerndokumentation/assets/images/pubuntu.png"><link rel="icon" type="image/x-icon" href="/lerndokumentation/assets/images/favicon.ico"><link rel="stylesheet" href="/lerndokumentation/assets/css/app.css"><link rel="alternate" type="application/rss+xml" title="Way-Up 2020-2022" href="/lerndokumentation/feed.xml"><link rel="canonical" href="/lerndokumentation/2020/08/21/ubuntu-20.04-user-setup-mit-ansible/"><base href="/lerndokumentation/" /></head><body id="ubuntu-20-04-user-setup-mit-ansible" class="post-layout"><header class="header"> <a class="header__title" href="/lerndokumentation/">Way-Up 2020-2022</a><nav><ul class="header__list"><li><a href="/lerndokumentation/">Home</a></li><li><a href="https://www.puzzle.ch/de/blog/articles/author/fbertagna">Über mich</a></li></ul></nav></header><main class="💈"><div class="post"><article itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting"><div class="post__header section-padding--double"><div class="grid-small"><h2 itemprop="name headline">Ubuntu-20.04 - User-Setup mit Ansible</h2><time class="post__date" datetime="2020-08-21T00:00:00+00:00" itemprop="datePublished">21 Aug 2020</time></div></div><div class="post__img"><div><figure class="absolute-bg" style="background-image: url('/lerndokumentation/assets/images/pubuntu.png');"></figure></div></div><div class="post__content section-padding"><div class="grid"><div id="markdown" itemprop="articleBody"><p>Bei Puzzle ITC wird standardmässig Ubuntu als Betriebssystem eingesetzt. Bezieht ein Member ein neues Notebook, erhält sie oder er ein Notebook mit einem Ubuntu welches den Puzzle-Bedürfnissen entsprechend vorkonfiguriert ist. Dazu gehören zum Beispiel ein vorkonfiguriertes VPN, bereits installierte Druckertreiber und Drucker, internes Wifi schon eingerichtet, Adminzugriff für den Support, Netzwerk shares eingerichtet sowie auch einen Puzzle-Brand-Touch am Gnome.</p><p>Bestehend war das Staging-Setup für Ubuntu 18.04 LTS. Über den internen PXE Server konnte man das Ubuntu 18.04 LTS Image und einige preseed-Files beziehen, welche den Installationsvorgang automatisieren sollten, sowie auch nach dem ersten Einloggen des neuen Users weitere Puzzle-Konfigurations-Prozesse mit Ansible-Pull triggerten. Nun war mein Auftrag, infolge des Ubuntu LTS-Update auf 20.04. das Setup der neuen Betriebssystem-Version anzupassen und, so weit möglich, zu vereinfachen.</p><p>Dazu habe ich mich erstmals mit dem bestehenden Setup auseinandersetzen müssen, um zu sehen wie das Ganze zurzeit funktionierte und anschliessend alle Schritte vom PXE-Boot bis zum Ansible-Setup dem neuen Betriebssystem anpassen.</p><p>Mit allen Neuerungen und Anpassungen kann das bestehende Setup in folgenden Schritten abgebildet werden, welche ich anschliessend noch etwas genauer beschreiben werde, zusammenfasst werden:</p><p><img src="/lerndokumentation/assets/images/pubuntu-setup-diagram.png" alt="Pubuntu Setup Diagramm" /></p><h2 id="1-pxe-boot--install-mit-preseed">1. PXE Boot &amp; Install mit preseed</h2><p>Ist ein Notebook am internen Netz angeschlossen, kann vom internen Puzzle-PXE-Server die Ganze OS-‘Menukarte’ vom aus Notebook abgiefragt werden. In diesem Menu existiert für das Ubuntu-20.04-Setup folgende Auswahl:</p><div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>...
+<!DOCTYPE html><html lang="en"><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Ubuntu-20.04 - User-Setup mit Ansible | Way-Up 2020-2022</title><meta name="description" content="Dokunentation meiner Ausbildung bei Puzzle ITC zum Systemtechniker EFZ."><meta itemprop="name" content="Fabio Bertagna"><meta itemprop="description" content="Dokunentation meiner Ausbildung bei Puzzle ITC zum Systemtechniker EFZ."><meta itemprop="image" content="/lerndokumentation/assets/images/pubuntu.png"><meta property="og:url" content="/lerndokumentation/2020/08/21/ubuntu-20.04-user-setup-mit-ansible/"><meta property="og:type" content="website"><meta property="og:title" content="Ubuntu-20.04 - User-Setup mit Ansible | Way-Up 2020-2022"><meta property="og:site_name" content="Way-Up 2020-2022"><meta property="og:description" content="Dokunentation meiner Ausbildung bei Puzzle ITC zum Systemtechniker EFZ."><meta property="og:image" content="/lerndokumentation/assets/images/pubuntu.png"><link rel="icon" type="image/x-icon" href="/lerndokumentation/assets/images/favicon.ico"><link rel="stylesheet" href="/lerndokumentation/assets/css/app.css"><link rel="stylesheet" href="/lerndokumentation/assets/css/syntax.css"><link rel="alternate" type="application/rss+xml" title="Way-Up 2020-2022" href="/lerndokumentation/feed.xml"><link rel="canonical" href="/lerndokumentation/2020/08/21/ubuntu-20.04-user-setup-mit-ansible/"><base href="/lerndokumentation/" /></head><body id="ubuntu-20-04-user-setup-mit-ansible" class="post-layout"><header class="header"> <a class="header__title" href="/lerndokumentation/">Way-Up 2020-2022</a><nav><ul class="header__list"><li><a href="/lerndokumentation/">Home</a></li><li><a href="https://www.puzzle.ch/de/blog/articles/author/fbertagna">Über mich</a></li></ul></nav></header><main class="💈"><div class="post"><article itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting"><div class="post__header section-padding--double"><div class="grid-small"><h2 itemprop="name headline">Ubuntu-20.04 - User-Setup mit Ansible</h2><time class="post__date" datetime="2020-08-21T00:00:00+00:00" itemprop="datePublished">21 Aug 2020</time></div></div><div class="post__img"><div><figure class="absolute-bg" style="background-image: url('/lerndokumentation/assets/images/pubuntu.png');"></figure></div></div><div class="post__content section-padding"><div class="grid"><div id="markdown" itemprop="articleBody"><p>Bei Puzzle ITC wird standardmässig Ubuntu als Betriebssystem eingesetzt. Bezieht ein Member ein neues Notebook, erhält sie oder er ein Notebook mit einem Ubuntu welches den Puzzle-Bedürfnissen entsprechend vorkonfiguriert ist. Dazu gehören zum Beispiel ein vorkonfiguriertes VPN, bereits installierte Druckertreiber und Drucker, internes Wifi schon eingerichtet, Adminzugriff für den Support, Netzwerk shares eingerichtet sowie auch einen Puzzle-Brand-Touch am Gnome.</p><p>Bestehend war das Staging-Setup für Ubuntu 18.04 LTS. Über den internen PXE Server konnte man das Ubuntu 18.04 LTS Image und einige preseed-Files beziehen, welche den Installationsvorgang automatisieren sollten, sowie auch nach dem ersten Einloggen des neuen Users weitere Puzzle-Konfigurations-Prozesse mit Ansible-Pull triggerten. Nun war mein Auftrag, infolge des Ubuntu LTS-Update auf 20.04. das Setup der neuen Betriebssystem-Version anzupassen und, so weit möglich, zu vereinfachen.</p><p>Dazu habe ich mich erstmals mit dem bestehenden Setup auseinandersetzen müssen, um zu sehen wie das Ganze zurzeit funktionierte und anschliessend alle Schritte vom PXE-Boot bis zum Ansible-Setup dem neuen Betriebssystem anpassen.</p><p>Mit allen Neuerungen und Anpassungen kann das bestehende Setup in folgenden Schritten abgebildet werden, welche ich anschliessend noch etwas genauer beschreiben werde, zusammenfasst werden:</p><p><img src="/lerndokumentation/assets/images/pubuntu-setup-diagram.png" alt="Pubuntu Setup Diagramm" /></p><h2 id="1-pxe-boot--install-mit-preseed">1. PXE Boot &amp; Install mit preseed</h2><p>Ist ein Notebook am internen Netz angeschlossen, kann vom internen Puzzle-PXE-Server die Ganze OS-‘Menukarte’ vom aus Notebook abgiefragt werden. In diesem Menu existiert für das Ubuntu-20.04-Setup folgende Auswahl:</p><div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="syntax"><code>...
 menu PXE Boot Options
 ...
 item pubuntu-net-20.04 Puzzle Ubuntu 20.04 installation
@@ -10,5 +10,157 @@ kernel ${base-url}/linux
 initrd ${base-url}/initrd.gz
 imgargs linux initrd=initrd.gz auto=true fb=false priority=critical preseed/locale=en_US kbd-chooser/method=ch keymap=ch debian-installer/keymap=ch preseed/url=http:///pubuntu.seed
 boot ||  
-</code></pre></div></div><h2 id="2">2.</h2></div></div></div><div class="section-padding--none"><div class="grid"><hr class="sep"/></div></div><div class="section-padding"><div class="grid-small"> <span class="post__author">Posted by <a href="https://www.puzzle.ch/de/blog/articles/author/fbertagna" title="More By Fabio Bertagna">Fabio Bertagna</a></span><p class="post__bio"></p></div></div></article></div><section class="related section-padding"><div class="grid-xlarge"><h2 class="related__title">Related</h2><div class="related__container"><article class="related__post"> <a class="related__link" href="/lerndokumentation/2020/08/21/ubuntu-20.04-user-setup-mit-ansible/"><figure class="related__img"> <img src="/lerndokumentation/assets/images/pubuntu.png" alt="Ubuntu-20.04 - User-Setup mit Ansible"/></figure><div><h2 class="related__text">Ubuntu-20.04 - User-Setup mit Ansible</h2></div></a></article><article class="related__post"> <a class="related__link" href="/lerndokumentation/2020/02/08/ansible-labs/"><figure class="related__img"> <img src="/lerndokumentation/assets/images/ansible-logo.png" alt="ansible-labs"/></figure><div><h2 class="related__text">ansible-labs</h2></div></a></article></div></div></section></main><footer class="footer section-padding"><div class="grid"><hr class="sep--white"/><div class="footer__container"><ul class="footer__tags"><li><a class="footer__link" href="/tag/linux">Linux</a></li><li><a class="footer__link" href="/tag/ansible">Ansible</a></li><li><a class="footer__link" href="/tag/ubuntu">Ubuntu</a></li><li><a class="footer__link" href="/tag/prometheus">Prometheus</a></li></ul></div></div></footer><script src="/lerndokumentation/assets/js/app.min.js"></script></body></html>
+
+</code></pre></div></div><p>Was nun bei der Auswahl von <code class="language-plaintext highlighter-rouge">:pubuntu-net-20.04</code> geschieht ist, dass das aktuelle Netboot-Installer aus dem Ubuntu-Archiv heruntergeladen und mit den oben aufgelisteten <code class="language-plaintext highlighter-rouge">imgargs</code> ausgeführt. Wichtig ist hierbei des letzte Argument <code class="language-plaintext highlighter-rouge">preseed/url</code>. Mit diesem Argument wird der Pfad zur Preseed-Datei angegeben, welche wir gleich genauer anschauen werden.</p><p>Wurde der Netboot-Installer geladen, startet der debian-installer und die Installation beginnt. Normalerweise würd man an diesem Punkt auf Konfigurationsfragen wie z.B. Tastatur-Layout, Netzwerk, Festplatten-Partitionierung und Verschlüsselung, Sprache oder Benutzereinrichtung. Da aber die ganze Installation automatisiert sein soll, verwenden wir das oben erwähnte Preseed-File. Diese Datei enthält alle Antworten auf die Fragen, welche der debian-installer während der Installation fragen wird plus noch einige Extra-Befehle die am Schluss der Installation ausgeführt werden um die Installation auf unsere Puzzle-Wünsche anzupassen.</p><p>Wie ein solches Preseed-File ausswhen kann und wie man es zusammenstellt ist wird <a href="https://help.ubuntu.com/lts/installation-guide/s390x/apb.html">hier</a> in der Ubuntu Dokumentation erklärt. Wichtig für unser Setup aber ist besonders diese Voreinstellung der Installation:</p><div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="syntax"><code>d-i preseed/late_command string \
+  modprobe nfs ;\
+  mkdir /target/mnt/pubuntu /target/root/scripts ;\
+  mount -t nfs -o port=2049,nolock,proto=tcp :/nfs/netboot/pubuntu /target/mnt/pubuntu ;\
+  in-target rsync -av --progress /mnt/pubuntu/preseed/scripts/ /root/scripts/ ;\
+  chmod +x /target/root/scripts/oem-setup.sh ;\
+  chmod +x /target/root/scripts/user-setup.sh ;\
+  chmod +x /target/root/scripts/wifi.sh ;\
+  in-target /root/scripts/oem-setup.sh preseed
+
+</code></pre></div></div><p>Für unser automatisiertes Setup ist der letzte Befehtl <code class="language-plaintext highlighter-rouge">preseed/late_command</code> besonders wichtig. Was hier geschieht ist, dass nach der Ubuntu Installation die nach dem <code class="language-plaintext highlighter-rouge">string</code> aufgeführten Befehle im neu installierten Betriebssystem ausgeführt werden. In unserem Fall möchten wir am Schluss der Installation ein script <code class="language-plaintext highlighter-rouge">oem-setup.sh</code> ausführen. Dafür muss dieses Skript zuerst im neuen System vorhanden und ausführbar vorliegen. Die ersten drei Befehle mounten den iPXE-Server von Puzzle und kopieren anschliessend das <code class="language-plaintext highlighter-rouge">oem-setup.sh</code>-Skript sowie 2 weitere Skripts welche vom <code class="language-plaintext highlighter-rouge">oem-setup.sh</code> benötigt werden auf das System. Diese werden anschliessend ausführbar gemacht, und zuletzt wird das <code class="language-plaintext highlighter-rouge">oem-setup.sh</code>-Skript <code class="language-plaintext highlighter-rouge">in-target</code> oder im kontext des neuen Betriebssystems (d.h. nicht im debian-installer) ausgeführt.</p><p>Dieses Skript bringt uns in die Nächste Phase, das OEM-Setup von Ubuntu für Puzzle-Members.</p><h2 id="2-oem-setup">2. OEM-Setup</h2><p>Das Betriebssystem ist bereit, hat jedoch noch keine Benutzer. Das soll auch so bleiben, bis die Member das Notebook das erste Mal in Empfang nehmen. Um nun Voreinstellungen vorzunehmen ohne selber zuerst einen User erstellen und anschliessend wieder löschen zu müssen, verwenden wir den OEM-Mode. Hierbei wird der OEM-User erstellt, welchen wir benutzen, um alle Einstellungen vorzunehmen, welche die Puzzle-Members bei einem neuen Notebook out-of-the-box vorfinden sollten. Im automatisierten Installations- Prozess von Abschnitt 1, packen wir diese Einstellungen, welche der OEM-User vornehmen soll ins <code class="language-plaintext highlighter-rouge">oem-setup.sh</code>-Skript:</p><div class="language-bash highlighter-rouge"><div class="highlight"><pre class="syntax"><code><span class="c">#!/bin/bash</span>
+<span class="c"># Runs initial oem user setup after first install.</span>
+
+<span class="nb">dir</span><span class="o">=</span><span class="s2">"</span><span class="si">$(</span><span class="nb">dirname</span> <span class="si">$(</span><span class="nb">readlink</span> <span class="nt">-f</span> <span class="nv">$0</span><span class="si">))</span><span class="s2">"</span>
+<span class="nb">cd</span> <span class="nv">$dir</span>
+
+<span class="c"># write every shell output to terminal</span>
+<span class="nb">set</span> <span class="nt">-ex</span>
+
+<span class="c"># preseed setup step</span>
+<span class="k">if</span> <span class="o">[</span> <span class="s2">"</span><span class="nv">$1</span><span class="s2">"</span> <span class="o">==</span> <span class="s2">"preseed"</span> <span class="o">]</span><span class="p">;</span> <span class="k">then
+  </span><span class="nb">mkdir</span> <span class="nt">-p</span> /var/log/pubuntu-setup/
+  /bin/bash <span class="nv">$dir</span>/oem-setup.sh | <span class="nb">tee</span> /var/log/pubuntu-setup/oem-setup.log
+  <span class="nb">exit
+</span><span class="k">else
+  </span><span class="nb">mkdir</span> <span class="nt">-p</span> /etc/skel/.config/autostart/
+  <span class="nb">cat</span> <span class="o">&gt;</span> /etc/skel/.config/autostart/puzzle-user-setup.desktop <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh">
+  [Desktop Entry]
+  Type=Application
+  Exec=gnome-terminal -x bash -c "sudo /root/scripts/user-setup.sh start; exec bash;"
+  Hidden=false
+  NoDisplay=false
+  X-GNOME-Autostart-enabled=true
+  Name[en_US]=Puzzle ITC ansible-pull
+  Name=Puzzle ITC ansible-pull
+  Comment[en_US]=OS setup to be triggered after first user login. Should be removed after first execution.
+  Comment=
+</span><span class="no">EOF
+
+</span>  <span class="c"># Finish OEM setup and trigger 'new-user-boot'</span>
+  oem-config-prepare <span class="nt">--quiet</span>
+
+  <span class="nb">sleep </span>3600
+
+  <span class="nb">exit
+</span><span class="k">fi</span>
+
+</code></pre></div></div><p>Zuerst wird sichergestellt, dass die Ausführung dieses Skripts geloggt wird (Im System, nicht im Installations-Medium). Anschliessend setzt der OEM-User den Ordner <code class="language-plaintext highlighter-rouge">/etc/skel</code> für das Setup der Members auf. Die Besonderheit an diesem Ordner ist, dass <code class="language-plaintext highlighter-rouge">useradd</code> standardmässig diesen ‘Skeleton’- oder Skelett-Ordner beim Erstellen eines neuen Users um den Home-Directory des neuen Users zu erstellen. D.h. erstellt man einen user <em>bob</em> erstellt <code class="language-plaintext highlighter-rouge">useradd</code> für <em>bob</em> den Home-Ordner <code class="language-plaintext highlighter-rouge">/home/bob</code> und kopiert alles vom Ordner <code class="language-plaintext highlighter-rouge">/etc/skel</code> nach <code class="language-plaintext highlighter-rouge">/home/bob</code>. Für unser automatisiertes Setup also sehr praktisch.</p><p>Was wir im <code class="language-plaintext highlighter-rouge">/etc/skel</code> machen, ist das Bash-Skript <code class="language-plaintext highlighter-rouge">user-setup.sh</code> als Startup-Program dem zukünftigen User hinzuzufügen, damit schon beim ersten Login dieses Skript ausgeführt wird.</p><p>Ist nun das <code class="language-plaintext highlighter-rouge">oem-setup.sh</code>-Skript fertig, und der OEM-User nicht mehr gebraucht wird, sorgt der Befehl <code class="language-plaintext highlighter-rouge">oem-config-prerare --quiet</code> dafür, dass beim nächsten Starten des Notebooks, der OEM-User gelöscht wird (inklusive Home-Directory) und der User sich selbst auf dem Gerät registrieren kann.</p><p>Mit diesem letzten Befehl ist das Staging des Notebooks abgeschlossen, und der debian-installer fährt das Gerät herunter.</p><h2 id="3-user-registrierung">3. User-Registrierung</h2><p>Wird ein gestagtes Notebook deployed, wird der Member beim Aufstarten als Erstes aufgefordert sich als Benuzer zu erfassen.</p><p><img src="/lerndokumentation/assets/images/pubuntu-setup-create-user.png" alt="Create User" /></p><p>Hat der Member sich fertig registriert und eingeloggt, wird automatisch das im Abschnitt 2 eingefügte Programm ausgeführt. Dieses Startup-Programm führt dieses <code class="language-plaintext highlighter-rouge">user-setup.sh</code>-Skript aus:</p><div class="language-bash highlighter-rouge"><div class="highlight"><pre class="syntax"><code><span class="c">#!/bin/bash</span>
+
+<span class="c"># ensure proper logging</span>
+<span class="k">if</span> <span class="o">[</span> <span class="s2">"</span><span class="nv">$1</span><span class="s2">"</span> <span class="o">==</span> <span class="s2">"start"</span> <span class="o">]</span><span class="p">;</span> <span class="k">then
+  </span><span class="nb">mkdir</span> <span class="nt">-p</span> /var/log/pubuntu-setup/
+  /bin/bash /root/scripts/user-setup.sh | <span class="nb">tee</span> /var/log/pubuntu-setup/user-setup.log
+  <span class="nb">exit
+</span><span class="k">fi</span>
+
+<span class="c"># check if there are any wifi devices</span>
+<span class="k">if</span> <span class="o">[[</span> <span class="si">$(</span>iw dev<span class="si">)</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
+  <span class="c"># if so configure wifi</span>
+  <span class="nb">echo</span> <span class="s2">"Wifi setup"</span>
+  /root/scripts/wifi.sh
+<span class="k">fi</span>
+
+<span class="c">###### PUZZLE ENVIRONMENT ######</span>
+<span class="c">################################</span>
+
+<span class="c"># Install minimal packages:</span>
+apt update <span class="nt">-y</span>
+apt <span class="nb">install</span> <span class="nt">-y</span> <span class="se">\</span>
+  git <span class="se">\</span>
+  vim <span class="se">\</span>
+  curl <span class="se">\</span>
+  xterm <span class="se">\</span>
+  zenity <span class="se">\</span>
+  ansible <span class="se">\</span>
+  metacity <span class="se">\</span>
+  openssh-server <span class="se">\</span>
+  cracklib-runtime
+
+<span class="c"># output from bash in English</span>
+<span class="nb">echo</span> <span class="s1">'export LANG=en_US.UTF-8'</span> <span class="o">&gt;&gt;</span> /etc/bash.bashrc
+
+<span class="c">## prepare puzzle-ansible-pull ###</span>
+<span class="c">##################################</span>
+
+<span class="nb">mkdir</span> <span class="nt">-p</span> /var/lib/ansible/local
+<span class="nb">mkdir</span> <span class="nt">-p</span> /etc/puzzle-ansible/
+
+<span class="nb">cat</span> <span class="o">&gt;</span> /usr/local/bin/puzzle-ansible-pull <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh">
+#!/bin/bash
+ansible-pull </span><span class="se">\</span><span class="sh">
+    -d /var/lib/ansible/local </span><span class="se">\</span><span class="sh">
+    -U git@ssh.gitlab.com:p_itc_sys/ubuntu-ansible </span><span class="se">\</span><span class="sh">
+    -C master </span><span class="se">\</span><span class="sh">
+    --key-file /etc/puzzle-ansible/staging_sshkey </span><span class="se">\</span><span class="sh">
+    --accept-host-key | tee /var/log/puzzle-ansible-pull.logs &amp;&amp;
+
+    # disable user creation on puzzle-ansible-pull
+    sed 's/create_user: true/create_user: false/' /etc/puzzle-ansible/user.yml &gt; /etc/puzzle-ansible/user.yml
+</span><span class="no">EOF
+
+</span><span class="nb">chmod</span> +x /usr/local/bin/puzzle-ansible-pull
+
+<span class="c"># copy key</span>
+<span class="nb">cp</span> /root/scripts/staging_sshkey /etc/puzzle-ansible/staging_sshkey
+<span class="nb">chmod </span>600 /etc/puzzle-ansible/staging_sshkey
+
+<span class="c"># save the installation date</span>
+<span class="nb">date</span> +%c <span class="o">&gt;</span> /root/install-date
+
+<span class="c">### ansible-pull ###</span>
+<span class="c">####################</span>
+<span class="nv">CURRENT_USER</span><span class="o">=</span><span class="s2">"</span><span class="si">$(</span><span class="nb">who</span> | <span class="nb">awk</span> <span class="s1">'{ print $1 }'</span><span class="si">)</span><span class="s2">"</span>
+
+<span class="nb">echo</span> <span class="s2">"Configuring ansible pull for </span><span class="nv">$CURRENT_USER</span><span class="s2">"</span>
+
+<span class="nb">cat</span> <span class="o">&gt;</span> /etc/puzzle-ansible/user.yml <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh">
+---
+# User configurations will only be applied if this var is set to true
+create_user: true
+
+# The following variables are only used for user configuration
+user:
+    # Username
+    name: </span><span class="nv">$CURRENT_USER</span><span class="sh">
+    # Groupname
+    group: </span><span class="nv">$CURRENT_USER</span><span class="sh">
+    # Ldap-Username
+    ldapname: </span><span class="nv">$CURRENT_USER</span><span class="sh">
+    # Computername
+    hostname: </span><span class="nv">$CURRENT_USER</span><span class="sh">-puzzle
+</span><span class="no">EOF
+
+</span>/usr/local/bin/puzzle-ansible-pull
+
+<span class="c"># Clean up initial startup job if still exists</span>
+<span class="nb">rm</span> <span class="nt">-f</span> /home/<span class="nv">$CURRENT_USER</span>/.config/autostart/puzzle-user-setup.desktop
+
+<span class="nb">read</span> <span class="nt">-p</span> <span class="s2">"---- Do you want to reboot now (y/n)?"</span> choice
+<span class="k">case</span> <span class="s2">"</span><span class="nv">$choice</span><span class="s2">"</span> <span class="k">in
+  </span>y|Y <span class="p">)</span>
+    <span class="nb">echo</span> <span class="s2">"----------- Rebooting now. See you later! -----------"</span>
+    <span class="nb">sleep </span>2
+    reboot
+    <span class="p">;;</span>
+  n|N <span class="p">)</span>
+    <span class="nb">exit</span>
+    <span class="p">;;</span>
+  <span class="k">*</span> <span class="p">)</span> <span class="nb">echo</span> <span class="s2">"invalid"</span><span class="p">;;</span>
+<span class="k">esac</span>
+
+</code></pre></div></div><p>Dieses Skript ist nicht direkt zuständig für die Einrichtung des Notebooks, sondern bereitet das Gerät vor für ein ansible-pull, welches die Konfigurationen auf dem Laptop durchführen wird. Nach dieser Vorbereitung führt <code class="language-plaintext highlighter-rouge">user-setup.sh</code> das ansible-pull auch gleich aus.</p><p>Wichtig ist auch, das Entfernen des laufenden Skripts aus den Auto-Start-Programmen damit, diese Konfiguration beim nächsten Login nicht erneut durchgeführt wird.</p><h2 id="4-ansible-pull">4. Ansible-Pull</h2><p>Ansible-Pull wird verwendet um ein remote Ansible-Repo aun Node zu ziehen, wo anschliessend das Repo selbstständig z.B. mittels Cron-Job upgedated und ausgeführt werden kann. Genau das passiert auch beim Puzzle-Ubuntu setup. Das Ubuntu-Ansible-Repository wird von ansible-pull gepullt und ausgeführt. Hierbei wird folgendes gemacht:</p><ul><li>Benötigte Software installieren</li><li>Ungebrauchte Software entfernen</li><li>ansible-pull Cron-Job einrichten</li><li>Den Benutzer durch einen Disk-Verschlüsselungs-Passwort-Wechsel führen</li><li>Puzzle-Branding, mit Fonts, Sperrbildschirm-, Hintergrunds- und Boot-Bildern einrichten</li><li>User-Backup einrichten</li><li>Nextcoud anbindung einrichten</li><li>Internes Wifi einrichten</li><li>VPN einrichten</li></ul><p>Nach diesen Konfigurationsschritten ist das Betriebssystem fertig eingerichtet und das Gerät startet neu.</p></div></div></div><div class="section-padding--none"><div class="grid"><hr class="sep"/></div></div><div class="section-padding"><div class="grid-small"> <span class="post__author">Posted by <a href="https://www.puzzle.ch/de/blog/articles/author/fbertagna" title="More By Fabio Bertagna">Fabio Bertagna</a></span><p class="post__bio"></p></div></div></article></div><section class="related section-padding"><div class="grid-xlarge"><h2 class="related__title">Related</h2><div class="related__container"><article class="related__post"> <a class="related__link" href="/lerndokumentation/2020/08/21/ubuntu-20.04-user-setup-mit-ansible/"><figure class="related__img"> <img src="/lerndokumentation/assets/images/pubuntu.png" alt="Ubuntu-20.04 - User-Setup mit Ansible"/></figure><div><h2 class="related__text">Ubuntu-20.04 - User-Setup mit Ansible</h2></div></a></article><article class="related__post"> <a class="related__link" href="/lerndokumentation/2020/02/08/ansible-labs/"><figure class="related__img"> <img src="/lerndokumentation/assets/images/ansible-logo.png" alt="ansible-labs"/></figure><div><h2 class="related__text">ansible-labs</h2></div></a></article></div></div></section></main><footer class="footer section-padding"><div class="grid"><hr class="sep--white"/><div class="footer__container"><ul class="footer__tags"><li><a class="footer__link" href="/tag/linux">Linux</a></li><li><a class="footer__link" href="/tag/ansible">Ansible</a></li><li><a class="footer__link" href="/tag/ubuntu">Ubuntu</a></li><li><a class="footer__link" href="/tag/prometheus">Prometheus</a></li></ul></div></div></footer><script src="/lerndokumentation/assets/js/app.min.js"></script></body></html>
   
