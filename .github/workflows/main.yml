@@ -9,8 +9,6 @@ on:
     branches:
       # only deploy from master
       - master
-  schedule:
-    - cron: "0 2 * * *"
 
 jobs:
   deploy:
