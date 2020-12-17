@@ -9,3 +9,172 @@ tags:
   - Ubuntu
   - Linux
 ---
+Für die Entwicklung des neuen automatisierten Ubuntu 20.04 - PXE Setup musste ich
+mir zu Beginn eine Test-Umgebung einrichten. Hierbei habe ich mich entschieden,
+jeweils ein Ubuntu-Image mit meinen Preeseds, Configs und Skripts lokal zu bauen
+und anschliessend diese auf einen USB-Stick zu flashen und an eimem Testgerät zu 
+testen.
+
+Als Erstes habe ich versucht ein Ubuntu Image auf einen USB-Stick mit `dd` zu
+schreiben und anschliessend dort drauf in den entsprechenden Dateien Boot-Paramter
+anzupassen so wie auch Preseed-Files und Scripts zu hinterlegen. Hier musste ich
+leider feststellen, dass das offizielle Ubuntu-20.04-LTS Image als read-only
+Filesystem auf den Stick geschrieben wird. Dies wahrscheinlich aus 
+Sicherheitsgründen, da so die Integrität des Images gewährleistet weren kann.
+
+Daher habe ich zum Testen der Preseeds und Setup-Scripts ein Bash-Tool 
+geschrieben welches das Bauen von benuzerdefinierte Images
+automatisieren sollte. Das Skript sollte in folgenden Schritten ablaufen:
+ 1. Überprüfung auf korrekte Ausführung.
+ 2. Erstellen einer temporären Ausführungs-Umgebung.
+ 3. ISO falls nötig aus dem Ubuntu Archiv herunterladen.
+ 4. Ubuntu 20.04 ISO mounten.
+ 5. Eine Kopie des gemounteten Images anlegen.
+ 6. Änderungen an der Image Kopie vornehmen.
+ 7. MD5 Checksum der Kopie neu berechnen und im neuen Image speichern.
+ 8. Neues ISO aus der Kopie anfertigen.
+
+Im Skript ist diese Prozedur im `main()` folgendermassen abgebilder:
+```bash
+function main() {
+    _ensure_proper_usage
+    _ensure_dependencies
+    _create_temporary_runtime_environment
+    _get_iso
+    _mount_iso
+    _create_custom_iso
+    _md5_custom_iso
+    _build_custom_iso
+}
+```
+
+### 1. Überprüfung auf korrekte Ausführung
+
+Das Tool soll höchstens einen Parameter entgegen nehmen und muss als root
+ausgeführt werden. Weiter soll der Parameter, falls vorhanden, auf seine
+Gültigkeit überprüft werden und die entsprechenden globalen Variabeln gesetzt
+werden.
+
+Der einzig gültige Parameter heisst `--official-source` und falls dieser gesetzt
+wurde, weiss das Skript, das das Ursprungs-Image zuerst aus dem Ubuntu-Archiv
+heruntergeladen werden muss. Also wird hier die Variabel `FROM_OFFICIAL_SOURCE`
+auf `true` gesetzt.
+
+Im Skript sind diese Schritte in der Funktion `_ensure_proper_usage()` zusammengefasst:
+
+```bash
+FROM_OFFICIAL_SOURCE=false
+
+function _ensure_proper_usage() {
+    # Check if run as root
+    if [ "$EUID" -ne 0 ]; then
+        __error_exit "Please run as root"
+    fi
+
+    # accept max. 1 argument
+    if [ $# -gt 1 ]; then
+        __print_usage
+        __error_exit "Accepts only one argument."
+    fi
+
+    # if there is one argument
+    if [ $# -eq 1 ]; then
+        # and it is '--official-source'
+        # then set FROM_OFFICIAL_SOURCE flag to true
+        if [ "$1" = "--official-source" ]; then
+            FROM_OFFICIAL_SOURCE=true
+        else
+            __print_usage
+            __error_exit "Invalid option $1"
+        fi
+     fi
+}
+```
+
+Wird beim überprüfen der Parameter einen Fehler festgestellt, werden mit der
+Funktion `__print_usage` die Anwendungs-Spezifikationen auf der Konsole 
+ausgegeben und anschliessend das Skript mit dem Exit-Code 1 beendet.
+
+Beim Programmieren dieser Funktion, war es erstmals wichtig wie in einem
+Bash-Skript die Argumente abgerufen werden. Im Code sieht man wie ich für diesen
+einfachen Argument-Parser die Bash-Variablen `$#` und `$1` verwendet habe. Beim
+recherchieren habe ich oft auch gesehen, dass fürs Parsen der Argumente
+Case-Statements verwendet werden, jedoch war es einfacher bei nur einem möglichen
+Argument eine If-Else-Verzweigung zu verwenden.
+
+Wurde das Skript auf korrekte Anwendung überprüft und die Image-Quelle angegeben,
+wird als nächsten Schritt der Ausführung eine temporäre Umgebung erstellt, worin
+das Skript die Images mounten und beareiten wird.
+
+### 2. Erstellen einer Temporären Ausführungs-Umgebung
+
+Das Skript soll gewährleisten   
+Um einen sauberen Programmabbruch zu gewährleisten folgt dem Erstellen der temporären
+Umgebung ein `trap` welches sicherstellt, dass beim Abbruch des Skripts, gemountete Images unmounted und gelöscht werden.
+```bash
+### Create temp env ###
+ #######################
+EXEC_DIR="$(dirname $(readlink -f $0))"
+mkdir -p $EXEC_DIR/logs/
+WDIR="$(mktemp -d /tmp/$(basename $(readlink -f $0)).XXXX)"
+cp -r config $WDIR/
+cd $WDIR
+
+trap "rm -rf $WDIR;" EXIT RETURN ERR
+```
+
+Der nächste Schritt besteht darin, das Base-Image zu finden, und zu mounten. Zu diesem Zeitpunkt steht bereits fest ob das Base-Image heruntergeladen
+werden muss, oder ob es bereits lokal existiert. Als nächstes stellt das Skript sicher dass das Base-Image lokal vorliegt. D.h. wurde der Parameter
+`--official-source` nicht angegeben, wird der Benutzer gefragt ob er oder sie ein lokales .iso benutzen möchten oder das aktuellste Image herunterladen
+möchten. Bei der Auswahl eines lokalen .iso, wird der Benutzer nach dem Pfad zur iso-Datei gefragt.
+
+```bash
+######################
+### Get base image ###
+######################
+if ! $FROM_OFFICIAL_SOURCE ; then
+  PS3="$STEP_PREFIX What base image should be used?  "
+  options=("Ubuntu 20.04 LTS web archive" "local .iso")
+  select opt in "${options[@]}"
+  do
+    case $opt in
+      "Ubuntu 20.04 LTS web archive")
+        download_official_img
+        break
+      ;;
+      "local .iso")
+        cd $EXEC_DIR
+        read -e -p "$STEP_PREFIX Set path to base .iso:  " INPUT_ISO
+
+        if [[ ! -f "$INPUT_ISO" && ! -f "$WDIR/$INPUT_ISO" ]]; then
+          echo "$SUB_STEP_PREFIX Input .iso not found"
+          echo "$STEP_PREFIX Aborting build"
+          exit 1
+        fi
+
+        INPUT_ISO="$(realpath $INPUT_ISO)"
+
+        cd $WDIR
+        break
+        ;;
+      *) echo "invalid option $REPLY";;
+    esac
+  done
+else
+  download_official_img
+fi
+```
+Muss das Image heruntergeladen werden, wird die Funktion `download_official_img` aufgerufen, welche das Image herunterlädt und es in der temporären
+Umgebung abspeichert:
+```bash
+
+function download_official_img () {
+  echo "$SUB_STEP_PREFIX downloading image"
+  ARCHIVE_URL=https://releases.ubuntu.com/20.04/ubuntu-20.04-desktop-amd64.iso
+  INPUT_ISO=$WDIR/$(basename "$ARCHIVE_URL")
+  wget $ARCHIVE_URL
+}
+
+```
+
+
