@@ -26,18 +26,18 @@ Daher habe ich zum Testen der Preseeds und Setup-Scripts ein Bash-Tool
 geschrieben welches das Bauen von benuzerdefinierte Images
 automatisieren sollte. Das Skript sollte in folgenden Schritten ablaufen:
  1. Überprüfung auf korrekte Ausführung.
- 2. Erstellen einer temporären Ausführungs-Umgebung.
- 3. ISO falls nötig aus dem Ubuntu Archiv herunterladen.
- 4. Ubuntu 20.04 ISO mounten.
- 5. Eine Kopie des gemounteten Images anlegen.
- 6. Änderungen an der Image Kopie vornehmen.
+ 2. Benötigte Software installieren.
+ 3. Erstellen einer temporären Ausführungs-Umgebung.
+ 4. ISO falls nötig aus dem Ubuntu Archiv herunterladen.
+ 5. Ubuntu 20.04 ISO mounten.
+ 6. Das gemountete Image kopieren und bearbeiten.
  7. MD5 Checksum der Kopie neu berechnen und im neuen Image speichern.
  8. Neues ISO aus der Kopie anfertigen.
 
 Im Skript ist diese Prozedur im `main()` folgendermassen abgebilder:
 ```bash
 function main() {
-    _ensure_proper_usage
+    _ensure_proper_usage $@
     _ensure_dependencies
     _create_temporary_runtime_environment
     _get_iso
@@ -56,7 +56,7 @@ Gültigkeit überprüft werden und die entsprechenden globalen Variabeln gesetzt
 werden.
 
 Der einzig gültige Parameter heisst `--official-source` und falls dieser gesetzt
-wurde, weiss das Skript, das das Ursprungs-Image zuerst aus dem Ubuntu-Archiv
+wurde, weiss das Skript, dass das Ursprungs-Image zuerst aus dem Ubuntu-Archiv
 heruntergeladen werden muss. Also wird hier die Variabel `FROM_OFFICIAL_SOURCE`
 auf `true` gesetzt.
 
@@ -98,83 +98,257 @@ ausgegeben und anschliessend das Skript mit dem Exit-Code 1 beendet.
 Beim Programmieren dieser Funktion, war es erstmals wichtig wie in einem
 Bash-Skript die Argumente abgerufen werden. Im Code sieht man wie ich für diesen
 einfachen Argument-Parser die Bash-Variablen `$#` und `$1` verwendet habe. Beim
-recherchieren habe ich oft auch gesehen, dass fürs Parsen der Argumente
+Recherchieren habe ich oft auch gesehen, dass fürs Parsen der Argumente
 Case-Statements verwendet werden, jedoch war es einfacher bei nur einem möglichen
 Argument eine If-Else-Verzweigung zu verwenden.
 
-Wurde das Skript auf korrekte Anwendung überprüft und die Image-Quelle angegeben,
-wird als nächsten Schritt der Ausführung eine temporäre Umgebung erstellt, worin
-das Skript die Images mounten und beareiten wird.
-
-### 2. Erstellen einer Temporären Ausführungs-Umgebung
-
-Das Skript soll gewährleisten   
-Um einen sauberen Programmabbruch zu gewährleisten folgt dem Erstellen der temporären
-Umgebung ein `trap` welches sicherstellt, dass beim Abbruch des Skripts, gemountete Images unmounted und gelöscht werden.
+### 2. Installieren der benötigten Tools
+Damit später das ISO richtig verpackt und gebaut werden kann, müssen die 
+richtigen Tools dazu vorhanden sein. Das Skript stellt das Ganze in dieser
+Funktion sicher:
 ```bash
-### Create temp env ###
- #######################
-EXEC_DIR="$(dirname $(readlink -f $0))"
-mkdir -p $EXEC_DIR/logs/
-WDIR="$(mktemp -d /tmp/$(basename $(readlink -f $0)).XXXX)"
-cp -r config $WDIR/
-cd $WDIR
-
-trap "rm -rf $WDIR;" EXIT RETURN ERR
-```
-
-Der nächste Schritt besteht darin, das Base-Image zu finden, und zu mounten. Zu diesem Zeitpunkt steht bereits fest ob das Base-Image heruntergeladen
-werden muss, oder ob es bereits lokal existiert. Als nächstes stellt das Skript sicher dass das Base-Image lokal vorliegt. D.h. wurde der Parameter
-`--official-source` nicht angegeben, wird der Benutzer gefragt ob er oder sie ein lokales .iso benutzen möchten oder das aktuellste Image herunterladen
-möchten. Bei der Auswahl eines lokalen .iso, wird der Benutzer nach dem Pfad zur iso-Datei gefragt.
-
-```bash
-######################
-### Get base image ###
-######################
-if ! $FROM_OFFICIAL_SOURCE ; then
-  PS3="$STEP_PREFIX What base image should be used?  "
-  options=("Ubuntu 20.04 LTS web archive" "local .iso")
-  select opt in "${options[@]}"
-  do
-    case $opt in
-      "Ubuntu 20.04 LTS web archive")
-        download_official_img
-        break
-      ;;
-      "local .iso")
-        cd $EXEC_DIR
-        read -e -p "$STEP_PREFIX Set path to base .iso:  " INPUT_ISO
-
-        if [[ ! -f "$INPUT_ISO" && ! -f "$WDIR/$INPUT_ISO" ]]; then
-          echo "$SUB_STEP_PREFIX Input .iso not found"
-          echo "$STEP_PREFIX Aborting build"
-          exit 1
-        fi
-
-        INPUT_ISO="$(realpath $INPUT_ISO)"
-
-        cd $WDIR
-        break
-        ;;
-      *) echo "invalid option $REPLY";;
-    esac
-  done
-else
-  download_official_img
-fi
-```
-Muss das Image heruntergeladen werden, wird die Funktion `download_official_img` aufgerufen, welche das Image herunterlädt und es in der temporären
-Umgebung abspeichert:
-```bash
-
-function download_official_img () {
-  echo "$SUB_STEP_PREFIX downloading image"
-  ARCHIVE_URL=https://releases.ubuntu.com/20.04/ubuntu-20.04-desktop-amd64.iso
-  INPUT_ISO=$WDIR/$(basename "$ARCHIVE_URL")
-  wget $ARCHIVE_URL
+function _ensure_dependencies() {
+    __print "Installng dependencies..."
+    apt install \
+        syslinux \
+        isolinux \
+        syslinux-utils \
+        syslinux-efi \
+        -y
 }
 
 ```
+### 3. Erstellen einer Temporären Ausführungs-Umgebung
+
+Wird das Skript ausgefüht soll sich der Benutzende nicht Sorgen machen um Dateien
+welche nach der Ausführung liegenbleiben und anschliessend vom User gelöscht
+werden müssen. Deshalb wird im Skript als Nächstes im `/tmp/` Ordner ein 
+temporärer Ordner erstellt, wo das Skript weiter drin arbeiten wird. Ist das
+Skript fertig oder bricht es ab, wird im Skiript mit einem `trap` sichergestellt, dass der zu Beginn erstellte temporäre ordner gelöscht wird.
+
+```bash
+function _create_temporary_runtime_environment() {
+    EXEC_DIR="$(dirname "$(readlink -f "$0")")"
+    mkdir -p "$EXEC_DIR"/logs/
+    WDIR="$(mktemp -d /tmp/"$(basename "$(readlink -f "$0")")".XXXX)"
+    cp -r config "$WDIR"/
+    cd "$WDIR"
+    trap 'sudo umount $WDIR/*; rm -rf $WDIR;' EXIT ERR
+}
+```
+
+### 4. Source des Ubuntu Images bestimmen.
+Als Nächstes braucht das Skript zu wissen, wo das Original-Ubuntu-ISO liegt.
+Hier wird als erstes überprüft ob im ersten Schritt `_ensure_proper_usage` das 
+Flag `FROM_OFFICIAL_SOURCE` auf `true` gesetzt wurde. Falls das nicht der Fall
+war, wird zunächst der User gefragt ob das Skript mit einem lokalen ISO
+fortfahren soll oder ob zuerst das ISO vom releases.ubuntu.com-Archiv
+heruntergeladen werden muss:
+```
+1) Ubuntu 20.04 LTS web archive
+2) local .iso
+What base image should be used? 
+```
+Möchte der User ein lokales ISO verwenden wir als nächstes gefragt den Pfad
+zu der lokalen Datei anzugeben. Möchte er das Image herunterladen, wird die
+Funktion `download_official_img` aufgerufen, welche das Image herunterlädt und es
+in der temporären Umgebung abspeichert. Das alles sieht im Code wie folgt aus:
+```bash
+INPUT_ISO=""
+
+function __download_official_img() {
+    __print "downloading image"
+    _ARCHIVE_URL=https://releases.ubuntu.com/20.04/ubuntu-20.04.1-desktop-amd64.iso
+    INPUT_ISO=$WDIR/$(basename "$_ARCHIVE_URL")
+    wget $_ARCHIVE_URL
+}
+
+function __prompt_and_get_local_iso() {
+    cd "$EXEC_DIR"
+    read -e -p "Set path to base .iso:  " INPUT_ISO
+
+    if [[ ! -f "$INPUT_ISO" && ! -f "$WDIR/$INPUT_ISO" ]]; then
+        __error_exit "Input .iso not found. Aborting build"
+    fi
+
+    INPUT_ISO="$(realpath "$INPUT_ISO")"
+
+    cd "$WDIR"
+}
+
+function _get_iso() {
+    if ! $FROM_OFFICIAL_SOURCE; then
+        PS3="What base image should be used?  "
+        options=("Ubuntu 20.04 LTS web archive" "local .iso")
+        select opt in "${options[@]}"; do
+            case $opt in
+            "Ubuntu 20.04 LTS web archive")
+                __download_official_img
+                break
+                ;;
+            "local .iso")
+                __prompt_and_get_local_iso
+                break
+                ;;
+            *) __print "invalid option $REPLY" ;;
+            esac
+        done
+    else
+        __download_official_img
+    fi
+}
+```
+
+### 5. Das originale ISO mounten und Kopie bearbeiten
+Nun beginnt das Skript mit dem ersten Schritt seiner Hauptaufgabe. Damit wir eine
+Kopie des Originalen ISO machen und anschliessend bearbeiten können, müssen wir
+das ISO erstmals mounten:
+```bash
+function _mount_iso() {
+    __print "Creating mountpoint"
+
+    mkdir -p "$WDIR"/iso-build "$WDIR"/mnt/iso-build-orig
+
+    MOUNTPOINT_ORIG=$WDIR/mnt/iso-build-orig
+
+    __print_n "Mounting iso "
+    mount -o loop "$INPUT_ISO" "$MOUNTPOINT_ORIG" >&"$EXEC_DIR"/logs/mount.log &
+    __wait_for_process $!
+}
+```
+
+Nun kann das System die Dateien des ISOs lesen.  
 
 
+### 6. Gemountetes Image kopieren und bearbeiten
+Nun wird der Schritt durchgeführt welcher das neue Image zusammenstellt. Hier wird
+erstmals das zuvor gemountete Image in einen neuen Ordner kopiert wo anschliessend
+die Notwendigen Änderungen an den neu kopierten Dateien vorgenommen werden.
+
+Die Dateien welche für den Preseed-Install verwendet werden sollen, werden vom
+Skript in einem Ordner mit folgender Datei-Struktur erwartet:
+```
+.
+|-config
+    |- custom.seed
+    |- txt.cfg
+    |- grub.cfg
+    |- preseed-files
+        |- ...
+```
+Hier ist das `custom.seed` das Preseed-File, das `txt.cfg` die Isolinux boot
+config mit den eigenen Kernel-Boot-Parameter welche, das `grub.cfg` die GRUB 
+config auch hier mit den angepassten Kernel-Boot-Parameter und der `preseed-files`
+Ordner welcher Dateien enthält welche z.B. im Preseed-File als Skript aufgerufen
+werden.
+
+Das Skript überprüft jeweils ob diese Files existieren, und kopiert sie 
+anschliessend an den richtigen Ort der ISO-Kopie.
+
+```bash
+function __ensure_config_file() {
+    if ! test -f "$1"; then
+        __error_exit "No $1 file in ./config/ directory found. Aborting build."
+    fi
+}
+
+
+function _create_custom_iso() {
+
+    CUSTOM_ISO_ROOT=$WDIR/mnt/iso-build
+
+    __print_n "Copying content of original iso "
+    cp -r "$MOUNTPOINT_ORIG/." "$CUSTOM_ISO_ROOT/" &
+    __wait_for_process $!
+
+    __print "Copying custom configurations from ./config to the new image"
+    __ensure_config_file "$WDIR"/config/txt.cfg
+    cp "$WDIR"/config/txt.cfg "$CUSTOM_ISO_ROOT"/isolinux/
+    chmod 444 "$CUSTOM_ISO_ROOT"/isolinux/txt.cfg
+
+    __ensure_config_file "$WDIR"/config/grub.cfg
+    cp "$WDIR"/config/grub.cfg "$CUSTOM_ISO_ROOT"/boot/grub/
+    chmod 444 "$CUSTOM_ISO_ROOT"/boot/grub/grub.cfg
+
+    __ensure_config_file "$WDIR"/config/custom.seed
+    cp "$WDIR"/config/custom.seed "$CUSTOM_ISO_ROOT"/preseed/
+    chmod 444 "$CUSTOM_ISO_ROOT"/preseed/custom.seed
+
+    mkdir -p "$CUSTOM_ISO_ROOT"/preseed-files/
+    cp -r "$WDIR"/config/preseed-files/. "$CUSTOM_ISO_ROOT"/preseed-files/
+}
+```
+
+### 7. MD5 Checksum neu berechnen
+Der letzte Schritt vor dem Bauen des neuen ISO-Image ist die MD5 Checksums im
+md5sum.txt der ISO-Kopie anzupassen. Dieser Schritt ist notwendig, damit das Image
+, welches wir bauen möchten, beim Booten auf Authentizität überprüft werden kann.
+
+```bash
+function _md5_custom_iso() {
+    cd "$CUSTOM_ISO_ROOT"
+    __print_n "Recomputing md5sum "
+    echo "" >"$CUSTOM_ISO_ROOT"/md5sum.txt
+    find boot casper pool install dists EFI .disk pics preseed -type f -print0 \
+        | xargs -0 -I % bash -c "md5sum % >> \"$CUSTOM_ISO_ROOT\"/md5sum.txt" \
+        >&"$EXEC_DIR"/logs/md5sum.log &
+    __wait_for_process $!
+}
+```
+### 8. Bauen des neuen ISO-Image
+Alles ist nun bereit fürs Bauen des neuen Images. Hierzu nimmt das Skript den 
+Master-Boot-Record des originalen Images mit `dd` in eine Kopie, und anschliessend
+wird das ISO mit `xorriso` gebuildet.
+```bash
+function _build_custom_iso() {
+    cd "$CUSTOM_ISO_ROOT"
+    __print_n "Building isohybrid UEFI ./pubuntu-20.04-desktop-amd64.iso "
+    
+    MBR_FILE=/tmp/ubuntu_isohybrid_mbr.img
+    trap 'rm -rf $MBR_FILE' EXIT RETURN ERR
+
+    dd if="$INPUT_ISO" bs=1 count=446 of="$MBR_FILE" \
+        >&"$EXEC_DIR"/logs/orig_iso_copy.log
+
+    xorriso -as mkisofs -r -V "Pubuntu 20.04 LTS - Puzzle ITC" \
+        -cache-inodes -J -l \
+        -isohybrid-mbr "$MBR_FILE" \
+        -c isolinux/boot.cat \
+        -b isolinux/isolinux.bin \
+        -no-emul-boot -boot-load-size 4 -boot-info-table \
+        -eltorito-alt-boot \
+        -e boot/grub/efi.img \
+        -no-emul-boot -isohybrid-gpt-basdat \
+        -o "$EXEC_DIR/pubuntu-20.04-desktop-amd64.iso" \
+        "$CUSTOM_ISO_ROOT" >&"$EXEC_DIR"/logs/xorriso.log &
+    __wait_for_process $!
+
+    rm "$MBR_FILE"
+
+    __print "Done!"
+
+    cd "$WDIR"
+
+    umount "$MOUNTPOINT_ORIG"
+}
+```
+Ist `xrriso` fertig, kann nun das Skript die Umgebung wieder aufräumen und ist
+dann mit seiner Ausführung fertig.
+
+### Learnings
+Die Automatisierung dieses Ablaufes war für mich in vielen Aspekten eine gute 
+Übung. Bevor ich dieses Command Line Tool geschriben habe, ist mir sehr bald
+aufgefallen, dass ich den selben Ablauf im Terminal wieder und wieder durchführte
+um die Preseed-Files in der Ubuntu-Installation testen zu können. So habe ich
+versucht möglichst viele Tasks und Befehle in meinen Arbeitsabläufen zu
+identifizieren, welche ich im Skript automatisieren kann. Weiter konnte ich mit
+diesem Skript meine Bash-Kenntnisse vertiefen und anwenden. Dabei fand ich
+es persönlich sehr nützlich und spannend folgendes im Bash zu lernen:
+ - Wie man Argumente parst und überprüft
+ - Ein menu mit `options` zu implementieren
+ - Error-Handling mit `trap`
+ - Mit `mktemp` temporäre Ordner erstellen
+ - Asynchrone Tasks implementieren mithilfe von `&`
+ - Einen einfachen 'Ladebalken' zu implementieren welcher auf &-Subshells wartet
+
+Das ganze Skript ist [hier](https://gist.github.com/DonGiovanni83/bb9d72d279e274c0f72394589a9629ab) auf Github zu finden.
