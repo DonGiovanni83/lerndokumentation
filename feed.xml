@@ -5,8 +5,8 @@
     <description>Dokunentation meiner Ausbildung bei Puzzle ITC zum Systemtechniker EFZ.</description>
     <link></link>
     <atom:link href="/lerndokumentation/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 17 Dec 2020 08:55:41 +0000</pubDate>
-    <lastBuildDate>Thu, 17 Dec 2020 08:55:41 +0000</lastBuildDate>
+    <pubDate>Wed, 23 Dec 2020 08:38:47 +0000</pubDate>
+    <lastBuildDate>Wed, 23 Dec 2020 08:38:47 +0000</lastBuildDate>
     <generator>Jekyll v4.1.1</generator>
     
       <item>
@@ -302,7 +302,341 @@ Das Ubuntu-Ansible-Repository wird von ansible-pull gepullt und ausgeführt. Hie
     
       <item>
         <title>Ubuntu 20.04 - Bootable USB Key mit preseed</title>
-        <description>
+        <description>&lt;p&gt;Für die Entwicklung des neuen automatisierten Ubuntu 20.04 - PXE Setup musste ich
+mir zu Beginn eine Test-Umgebung einrichten. Hierbei habe ich mich entschieden,
+jeweils ein Ubuntu-Image mit meinen Preeseds, Configs und Skripts lokal zu bauen
+und anschliessend diese auf einen USB-Stick zu flashen und an eimem Testgerät zu 
+testen.&lt;/p&gt;
+
+&lt;p&gt;Als Erstes habe ich versucht ein Ubuntu Image auf einen USB-Stick mit &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;dd&lt;/code&gt; zu
+schreiben und anschliessend dort drauf in den entsprechenden Dateien Boot-Paramter
+anzupassen so wie auch Preseed-Files und Scripts zu hinterlegen. Hier musste ich
+leider feststellen, dass das offizielle Ubuntu-20.04-LTS Image als read-only
+Filesystem auf den Stick geschrieben wird. Dies wahrscheinlich aus 
+Sicherheitsgründen, da so die Integrität des Images gewährleistet weren kann.&lt;/p&gt;
+
+&lt;p&gt;Daher habe ich zum Testen der Preseeds und Setup-Scripts ein Bash-Tool 
+geschrieben welches das Bauen von benuzerdefinierte Images
+automatisieren sollte. Das Skript sollte in folgenden Schritten ablaufen:&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;Überprüfung auf korrekte Ausführung.&lt;/li&gt;
+  &lt;li&gt;Benötigte Software installieren.&lt;/li&gt;
+  &lt;li&gt;Erstellen einer temporären Ausführungs-Umgebung.&lt;/li&gt;
+  &lt;li&gt;ISO falls nötig aus dem Ubuntu Archiv herunterladen.&lt;/li&gt;
+  &lt;li&gt;Ubuntu 20.04 ISO mounten.&lt;/li&gt;
+  &lt;li&gt;Das gemountete Image kopieren und bearbeiten.&lt;/li&gt;
+  &lt;li&gt;MD5 Checksum der Kopie neu berechnen und im neuen Image speichern.&lt;/li&gt;
+  &lt;li&gt;Neues ISO aus der Kopie anfertigen.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Im Skript ist diese Prozedur im &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;main()&lt;/code&gt; folgendermassen abgebilder:&lt;/p&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;syntax&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;function &lt;/span&gt;main&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    _ensure_proper_usage &lt;span class=&quot;nv&quot;&gt;$@&lt;/span&gt;
+    _ensure_dependencies
+    _create_temporary_runtime_environment
+    _get_iso
+    _mount_iso
+    _create_custom_iso
+    _md5_custom_iso
+    _build_custom_iso
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;1-überprüfung-auf-korrekte-ausführung&quot;&gt;1. Überprüfung auf korrekte Ausführung&lt;/h3&gt;
+
+&lt;p&gt;Das Tool soll höchstens einen Parameter entgegen nehmen und muss als root
+ausgeführt werden. Weiter soll der Parameter, falls vorhanden, auf seine
+Gültigkeit überprüft werden und die entsprechenden globalen Variabeln gesetzt
+werden.&lt;/p&gt;
+
+&lt;p&gt;Der einzig gültige Parameter heisst &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;--official-source&lt;/code&gt; und falls dieser gesetzt
+wurde, weiss das Skript, dass das Ursprungs-Image zuerst aus dem Ubuntu-Archiv
+heruntergeladen werden muss. Also wird hier die Variabel &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;FROM_OFFICIAL_SOURCE&lt;/code&gt;
+auf &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;true&lt;/code&gt; gesetzt.&lt;/p&gt;
+
+&lt;p&gt;Im Skript sind diese Schritte in der Funktion &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;_ensure_proper_usage()&lt;/code&gt; zusammengefasst:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;syntax&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;FROM_OFFICIAL_SOURCE&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;false
+
+&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;function &lt;/span&gt;_ensure_proper_usage&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;# Check if run as root&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$EUID&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-ne&lt;/span&gt; 0 &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then
+        &lt;/span&gt;__error_exit &lt;span class=&quot;s2&quot;&gt;&quot;Please run as root&quot;&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;fi&lt;/span&gt;
+
+    &lt;span class=&quot;c&quot;&gt;# accept max. 1 argument&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$# &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;-gt&lt;/span&gt; 1 &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then
+        &lt;/span&gt;__print_usage
+        __error_exit &lt;span class=&quot;s2&quot;&gt;&quot;Accepts only one argument.&quot;&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;fi&lt;/span&gt;
+
+    &lt;span class=&quot;c&quot;&gt;# if there is one argument&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$# &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;-eq&lt;/span&gt; 1 &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then&lt;/span&gt;
+        &lt;span class=&quot;c&quot;&gt;# and it is '--official-source'&lt;/span&gt;
+        &lt;span class=&quot;c&quot;&gt;# then set FROM_OFFICIAL_SOURCE flag to true&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$1&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;--official-source&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then
+            &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;FROM_OFFICIAL_SOURCE&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;true
+        &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;else
+            &lt;/span&gt;__print_usage
+            __error_exit &lt;span class=&quot;s2&quot;&gt;&quot;Invalid option &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$1&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;fi
+     fi&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Wird beim überprüfen der Parameter einen Fehler festgestellt, werden mit der
+Funktion &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;__print_usage&lt;/code&gt; die Anwendungs-Spezifikationen auf der Konsole 
+ausgegeben und anschliessend das Skript mit dem Exit-Code 1 beendet.&lt;/p&gt;
+
+&lt;p&gt;Beim Programmieren dieser Funktion, war es erstmals wichtig wie in einem
+Bash-Skript die Argumente abgerufen werden. Im Code sieht man wie ich für diesen
+einfachen Argument-Parser die Bash-Variablen &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;$#&lt;/code&gt; und &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;$1&lt;/code&gt; verwendet habe. Beim
+Recherchieren habe ich oft auch gesehen, dass fürs Parsen der Argumente
+Case-Statements verwendet werden, jedoch war es einfacher bei nur einem möglichen
+Argument eine If-Else-Verzweigung zu verwenden.&lt;/p&gt;
+
+&lt;h3 id=&quot;2-installieren-der-benötigten-tools&quot;&gt;2. Installieren der benötigten Tools&lt;/h3&gt;
+&lt;p&gt;Damit später das ISO richtig verpackt und gebaut werden kann, müssen die 
+richtigen Tools dazu vorhanden sein. Das Skript stellt das Ganze in dieser
+Funktion sicher:&lt;/p&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;syntax&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;function &lt;/span&gt;_ensure_dependencies&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    __print &lt;span class=&quot;s2&quot;&gt;&quot;Installng dependencies...&quot;&lt;/span&gt;
+    apt &lt;span class=&quot;nb&quot;&gt;install&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+        syslinux &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+        isolinux &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+        syslinux-utils &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+        syslinux-efi &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;-y&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;h3 id=&quot;3-erstellen-einer-temporären-ausführungs-umgebung&quot;&gt;3. Erstellen einer Temporären Ausführungs-Umgebung&lt;/h3&gt;
+
+&lt;p&gt;Wird das Skript ausgefüht soll sich der Benutzende nicht Sorgen machen um Dateien
+welche nach der Ausführung liegenbleiben und anschliessend vom User gelöscht
+werden müssen. Deshalb wird im Skript als Nächstes im &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/tmp/&lt;/code&gt; Ordner ein 
+temporärer Ordner erstellt, wo das Skript weiter drin arbeiten wird. Ist das
+Skript fertig oder bricht es ab, wird im Skiript mit einem &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;trap&lt;/code&gt; sichergestellt, dass der zu Beginn erstellte temporäre ordner gelöscht wird.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;syntax&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;function &lt;/span&gt;_create_temporary_runtime_environment&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nv&quot;&gt;EXEC_DIR&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;dirname&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;readlink&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$0&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+    &lt;span class=&quot;nb&quot;&gt;mkdir&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$EXEC_DIR&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;/logs/
+    &lt;span class=&quot;nv&quot;&gt;WDIR&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;mktemp&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; /tmp/&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;basename&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;readlink&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$0&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;.XXXX&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+    &lt;span class=&quot;nb&quot;&gt;cp&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-r&lt;/span&gt; config &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$WDIR&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;/
+    &lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$WDIR&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+    &lt;span class=&quot;nb&quot;&gt;trap&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'sudo umount $WDIR/*; rm -rf $WDIR;'&lt;/span&gt; EXIT ERR
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;4-source-des-ubuntu-images-bestimmen&quot;&gt;4. Source des Ubuntu Images bestimmen.&lt;/h3&gt;
+&lt;p&gt;Als Nächstes braucht das Skript zu wissen, wo das Original-Ubuntu-ISO liegt.
+Hier wird als erstes überprüft ob im ersten Schritt &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;_ensure_proper_usage&lt;/code&gt; das 
+Flag &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;FROM_OFFICIAL_SOURCE&lt;/code&gt; auf &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;true&lt;/code&gt; gesetzt wurde. Falls das nicht der Fall
+war, wird zunächst der User gefragt ob das Skript mit einem lokalen ISO
+fortfahren soll oder ob zuerst das ISO vom releases.ubuntu.com-Archiv
+heruntergeladen werden muss:&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;syntax&quot;&gt;&lt;code&gt;1) Ubuntu 20.04 LTS web archive
+2) local .iso
+What base image should be used? 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Möchte der User ein lokales ISO verwenden wir als nächstes gefragt den Pfad
+zu der lokalen Datei anzugeben. Möchte er das Image herunterladen, wird die
+Funktion &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;download_official_img&lt;/code&gt; aufgerufen, welche das Image herunterlädt und es
+in der temporären Umgebung abspeichert. Das alles sieht im Code wie folgt aus:&lt;/p&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;syntax&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;INPUT_ISO&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;function &lt;/span&gt;__download_official_img&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    __print &lt;span class=&quot;s2&quot;&gt;&quot;downloading image&quot;&lt;/span&gt;
+    &lt;span class=&quot;nv&quot;&gt;_ARCHIVE_URL&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;https://releases.ubuntu.com/20.04/ubuntu-20.04.1-desktop-amd64.iso
+    &lt;span class=&quot;nv&quot;&gt;INPUT_ISO&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$WDIR&lt;/span&gt;/&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;basename&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_ARCHIVE_URL&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;
+    wget &lt;span class=&quot;nv&quot;&gt;$_ARCHIVE_URL&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;function &lt;/span&gt;__prompt_and_get_local_iso&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$EXEC_DIR&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+    &lt;span class=&quot;nb&quot;&gt;read&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-e&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Set path to base .iso:  &quot;&lt;/span&gt; INPUT_ISO
+
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[[&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$INPUT_ISO&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$WDIR&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$INPUT_ISO&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;]]&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then
+        &lt;/span&gt;__error_exit &lt;span class=&quot;s2&quot;&gt;&quot;Input .iso not found. Aborting build&quot;&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;fi
+
+    &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;INPUT_ISO&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;realpath&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$INPUT_ISO&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+
+    &lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$WDIR&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;function &lt;/span&gt;_get_iso&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$FROM_OFFICIAL_SOURCE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then
+        &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;PS3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;What base image should be used?  &quot;&lt;/span&gt;
+        &lt;span class=&quot;nv&quot;&gt;options&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Ubuntu 20.04 LTS web archive&quot;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;local .iso&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;select &lt;/span&gt;opt &lt;span class=&quot;k&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;options&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[@]&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do
+            case&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$opt&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;in&lt;/span&gt;
+            &lt;span class=&quot;s2&quot;&gt;&quot;Ubuntu 20.04 LTS web archive&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+                __download_official_img
+                &lt;span class=&quot;nb&quot;&gt;break&lt;/span&gt;
+                &lt;span class=&quot;p&quot;&gt;;;&lt;/span&gt;
+            &lt;span class=&quot;s2&quot;&gt;&quot;local .iso&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+                __prompt_and_get_local_iso
+                &lt;span class=&quot;nb&quot;&gt;break&lt;/span&gt;
+                &lt;span class=&quot;p&quot;&gt;;;&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; __print &lt;span class=&quot;s2&quot;&gt;&quot;invalid option &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$REPLY&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;;;&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;esac&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;done
+    else
+        &lt;/span&gt;__download_official_img
+    &lt;span class=&quot;k&quot;&gt;fi&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;5-das-originale-iso-mounten-und-kopie-bearbeiten&quot;&gt;5. Das originale ISO mounten und Kopie bearbeiten&lt;/h3&gt;
+&lt;p&gt;Nun beginnt das Skript mit dem ersten Schritt seiner Hauptaufgabe. Damit wir eine
+Kopie des Originalen ISO machen und anschliessend bearbeiten können, müssen wir
+das ISO erstmals mounten:&lt;/p&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;syntax&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;function &lt;/span&gt;_mount_iso&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    __print &lt;span class=&quot;s2&quot;&gt;&quot;Creating mountpoint&quot;&lt;/span&gt;
+
+    &lt;span class=&quot;nb&quot;&gt;mkdir&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$WDIR&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;/iso-build &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$WDIR&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;/mnt/iso-build-orig
+
+    &lt;span class=&quot;nv&quot;&gt;MOUNTPOINT_ORIG&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$WDIR&lt;/span&gt;/mnt/iso-build-orig
+
+    __print_n &lt;span class=&quot;s2&quot;&gt;&quot;Mounting iso &quot;&lt;/span&gt;
+    mount &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; loop &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$INPUT_ISO&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$MOUNTPOINT_ORIG&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&amp;amp;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$EXEC_DIR&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;/logs/mount.log &amp;amp;
+    __wait_for_process &lt;span class=&quot;nv&quot;&gt;$!&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Nun kann das System die Dateien des ISOs lesen.&lt;/p&gt;
+
+&lt;h3 id=&quot;6-gemountetes-image-kopieren-und-bearbeiten&quot;&gt;6. Gemountetes Image kopieren und bearbeiten&lt;/h3&gt;
+&lt;p&gt;Nun wird der Schritt durchgeführt welcher das neue Image zusammenstellt. Hier wird
+erstmals das zuvor gemountete Image in einen neuen Ordner kopiert wo anschliessend
+die Notwendigen Änderungen an den neu kopierten Dateien vorgenommen werden.&lt;/p&gt;
+
+&lt;p&gt;Die Dateien welche für den Preseed-Install verwendet werden sollen, werden vom
+Skript in einem Ordner mit folgender Datei-Struktur erwartet:&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;syntax&quot;&gt;&lt;code&gt;.
+|-config
+    |- custom.seed
+    |- txt.cfg
+    |- grub.cfg
+    |- preseed-files
+        |- ...
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Hier ist das &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;custom.seed&lt;/code&gt; das Preseed-File, das &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;txt.cfg&lt;/code&gt; die Isolinux boot
+config mit den eigenen Kernel-Boot-Parameter welche, das &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;grub.cfg&lt;/code&gt; die GRUB 
+config auch hier mit den angepassten Kernel-Boot-Parameter und der &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;preseed-files&lt;/code&gt;
+Ordner welcher Dateien enthält welche z.B. im Preseed-File als Skript aufgerufen
+werden.&lt;/p&gt;
+
+&lt;p&gt;Das Skript überprüft jeweils ob diese Files existieren, und kopiert sie 
+anschliessend an den richtigen Ort der ISO-Kopie.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;syntax&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;function &lt;/span&gt;__ensure_config_file&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;test&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$1&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then
+        &lt;/span&gt;__error_exit &lt;span class=&quot;s2&quot;&gt;&quot;No &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$1&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt; file in ./config/ directory found. Aborting build.&quot;&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;fi&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+
+&lt;span class=&quot;k&quot;&gt;function &lt;/span&gt;_create_custom_iso&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+
+    &lt;span class=&quot;nv&quot;&gt;CUSTOM_ISO_ROOT&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$WDIR&lt;/span&gt;/mnt/iso-build
+
+    __print_n &lt;span class=&quot;s2&quot;&gt;&quot;Copying content of original iso &quot;&lt;/span&gt;
+    &lt;span class=&quot;nb&quot;&gt;cp&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-r&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$MOUNTPOINT_ORIG&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;/.&quot;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$CUSTOM_ISO_ROOT&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;/&quot;&lt;/span&gt; &amp;amp;
+    __wait_for_process &lt;span class=&quot;nv&quot;&gt;$!&lt;/span&gt;
+
+    __print &lt;span class=&quot;s2&quot;&gt;&quot;Copying custom configurations from ./config to the new image&quot;&lt;/span&gt;
+    __ensure_config_file &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$WDIR&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;/config/txt.cfg
+    &lt;span class=&quot;nb&quot;&gt;cp&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$WDIR&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;/config/txt.cfg &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$CUSTOM_ISO_ROOT&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;/isolinux/
+    &lt;span class=&quot;nb&quot;&gt;chmod &lt;/span&gt;444 &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$CUSTOM_ISO_ROOT&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;/isolinux/txt.cfg
+
+    __ensure_config_file &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$WDIR&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;/config/grub.cfg
+    &lt;span class=&quot;nb&quot;&gt;cp&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$WDIR&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;/config/grub.cfg &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$CUSTOM_ISO_ROOT&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;/boot/grub/
+    &lt;span class=&quot;nb&quot;&gt;chmod &lt;/span&gt;444 &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$CUSTOM_ISO_ROOT&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;/boot/grub/grub.cfg
+
+    __ensure_config_file &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$WDIR&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;/config/custom.seed
+    &lt;span class=&quot;nb&quot;&gt;cp&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$WDIR&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;/config/custom.seed &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$CUSTOM_ISO_ROOT&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;/preseed/
+    &lt;span class=&quot;nb&quot;&gt;chmod &lt;/span&gt;444 &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$CUSTOM_ISO_ROOT&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;/preseed/custom.seed
+
+    &lt;span class=&quot;nb&quot;&gt;mkdir&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$CUSTOM_ISO_ROOT&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;/preseed-files/
+    &lt;span class=&quot;nb&quot;&gt;cp&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-r&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$WDIR&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;/config/preseed-files/. &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$CUSTOM_ISO_ROOT&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;/preseed-files/
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;7-md5-checksum-neu-berechnen&quot;&gt;7. MD5 Checksum neu berechnen&lt;/h3&gt;
+&lt;p&gt;Der letzte Schritt vor dem Bauen des neuen ISO-Image ist die MD5 Checksums im
+md5sum.txt der ISO-Kopie anzupassen. Dieser Schritt ist notwendig, damit das Image
+, welches wir bauen möchten, beim Booten auf Authentizität überprüft werden kann.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;syntax&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;function &lt;/span&gt;_md5_custom_iso&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$CUSTOM_ISO_ROOT&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+    __print_n &lt;span class=&quot;s2&quot;&gt;&quot;Recomputing md5sum &quot;&lt;/span&gt;
+    &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$CUSTOM_ISO_ROOT&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;/md5sum.txt
+    find boot casper pool &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;dists EFI .disk pics preseed &lt;span class=&quot;nt&quot;&gt;-type&lt;/span&gt; f &lt;span class=&quot;nt&quot;&gt;-print0&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+        | xargs &lt;span class=&quot;nt&quot;&gt;-0&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-I&lt;/span&gt; % bash &lt;span class=&quot;nt&quot;&gt;-c&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;md5sum % &amp;gt;&amp;gt; &lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$CUSTOM_ISO_ROOT&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;/md5sum.txt&quot;&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+        &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&amp;amp;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$EXEC_DIR&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;/logs/md5sum.log &amp;amp;
+    __wait_for_process &lt;span class=&quot;nv&quot;&gt;$!&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;h3 id=&quot;8-bauen-des-neuen-iso-image&quot;&gt;8. Bauen des neuen ISO-Image&lt;/h3&gt;
+&lt;p&gt;Alles ist nun bereit fürs Bauen des neuen Images. Hierzu nimmt das Skript den 
+Master-Boot-Record des originalen Images mit &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;dd&lt;/code&gt; in eine Kopie, und anschliessend
+wird das ISO mit &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;xorriso&lt;/code&gt; gebuildet.&lt;/p&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;syntax&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;function &lt;/span&gt;_build_custom_iso&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$CUSTOM_ISO_ROOT&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+    __print_n &lt;span class=&quot;s2&quot;&gt;&quot;Building isohybrid UEFI ./pubuntu-20.04-desktop-amd64.iso &quot;&lt;/span&gt;
+    
+    &lt;span class=&quot;nv&quot;&gt;MBR_FILE&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;/tmp/ubuntu_isohybrid_mbr.img
+    &lt;span class=&quot;nb&quot;&gt;trap&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'rm -rf $MBR_FILE'&lt;/span&gt; EXIT RETURN ERR
+
+    &lt;span class=&quot;nb&quot;&gt;dd &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$INPUT_ISO&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;bs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;1 &lt;span class=&quot;nv&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;446 &lt;span class=&quot;nv&quot;&gt;of&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$MBR_FILE&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+        &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&amp;amp;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$EXEC_DIR&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;/logs/orig_iso_copy.log
+
+    xorriso &lt;span class=&quot;nt&quot;&gt;-as&lt;/span&gt; mkisofs &lt;span class=&quot;nt&quot;&gt;-r&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-V&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Pubuntu 20.04 LTS - Puzzle ITC&quot;&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;-cache-inodes&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-J&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-l&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;-isohybrid-mbr&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$MBR_FILE&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;-c&lt;/span&gt; isolinux/boot.cat &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;-b&lt;/span&gt; isolinux/isolinux.bin &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;-no-emul-boot&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-boot-load-size&lt;/span&gt; 4 &lt;span class=&quot;nt&quot;&gt;-boot-info-table&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;-eltorito-alt-boot&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;-e&lt;/span&gt; boot/grub/efi.img &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;-no-emul-boot&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-isohybrid-gpt-basdat&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$EXEC_DIR&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;/pubuntu-20.04-desktop-amd64.iso&quot;&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+        &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$CUSTOM_ISO_ROOT&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&amp;amp;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$EXEC_DIR&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;/logs/xorriso.log &amp;amp;
+    __wait_for_process &lt;span class=&quot;nv&quot;&gt;$!&lt;/span&gt;
+
+    &lt;span class=&quot;nb&quot;&gt;rm&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$MBR_FILE&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+
+    __print &lt;span class=&quot;s2&quot;&gt;&quot;Done!&quot;&lt;/span&gt;
+
+    &lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$WDIR&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+
+    umount &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$MOUNTPOINT_ORIG&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Ist &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;xrriso&lt;/code&gt; fertig, kann nun das Skript die Umgebung wieder aufräumen und ist
+dann mit seiner Ausführung fertig.&lt;/p&gt;
+
+&lt;h3 id=&quot;learnings&quot;&gt;Learnings&lt;/h3&gt;
+&lt;p&gt;Die Automatisierung dieses Ablaufes war für mich in vielen Aspekten eine gute 
+Übung. Bevor ich dieses Command Line Tool geschriben habe, ist mir sehr bald
+aufgefallen, dass ich den selben Ablauf im Terminal wieder und wieder durchführte
+um die Preseed-Files in der Ubuntu-Installation testen zu können. So habe ich
+versucht möglichst viele Tasks und Befehle in meinen Arbeitsabläufen zu
+identifizieren, welche ich im Skript automatisieren kann. Weiter konnte ich mit
+diesem Skript meine Bash-Kenntnisse vertiefen und anwenden. Dabei fand ich
+es persönlich sehr nützlich und spannend folgendes im Bash zu lernen:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Wie man Argumente parst und überprüft&lt;/li&gt;
+  &lt;li&gt;Ein menu mit &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;options&lt;/code&gt; zu implementieren&lt;/li&gt;
+  &lt;li&gt;Error-Handling mit &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;trap&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Mit &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mktemp&lt;/code&gt; temporäre Ordner erstellen&lt;/li&gt;
+  &lt;li&gt;Asynchrone Tasks implementieren mithilfe von &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;&amp;amp;&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Einen einfachen ‘Ladebalken’ zu implementieren welcher auf &amp;amp;-Subshells wartet&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Das ganze Skript ist &lt;a href=&quot;https://gist.github.com/DonGiovanni83/bb9d72d279e274c0f72394589a9629ab&quot;&gt;hier&lt;/a&gt; auf Github zu finden.&lt;/p&gt;
 </description>
         <pubDate>Tue, 04 Aug 2020 00:00:00 +0000</pubDate>
         <link>/lerndokumentation/2020/08/04/ubuntu-20.04-usb-preseed/</link>

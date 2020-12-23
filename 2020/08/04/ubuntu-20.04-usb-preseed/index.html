@@ -1,2 +1,191 @@
-<!DOCTYPE html><html lang="en"><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Ubuntu 20.04 - Bootable USB Key mit preseed | Way-Up 2020-2022</title><meta name="description" content="Dokunentation meiner Ausbildung bei Puzzle ITC zum Systemtechniker EFZ."><meta itemprop="name" content="Fabio Bertagna"><meta itemprop="description" content="Dokunentation meiner Ausbildung bei Puzzle ITC zum Systemtechniker EFZ."><meta itemprop="image" content="/lerndokumentation/assets/images/ubuntu-preseed.png"><meta property="og:url" content="/lerndokumentation/2020/08/04/ubuntu-20.04-usb-preseed/"><meta property="og:type" content="website"><meta property="og:title" content="Ubuntu 20.04 - Bootable USB Key mit preseed | Way-Up 2020-2022"><meta property="og:site_name" content="Way-Up 2020-2022"><meta property="og:description" content="Dokunentation meiner Ausbildung bei Puzzle ITC zum Systemtechniker EFZ."><meta property="og:image" content="/lerndokumentation/assets/images/ubuntu-preseed.png"><link rel="icon" type="image/x-icon" href="/lerndokumentation/assets/images/favicon.ico"><link rel="stylesheet" href="/lerndokumentation/assets/css/app.css"><link rel="stylesheet" href="/lerndokumentation/assets/css/syntax.css"><link rel="alternate" type="application/rss+xml" title="Way-Up 2020-2022" href="/lerndokumentation/feed.xml"><link rel="canonical" href="/lerndokumentation/2020/08/04/ubuntu-20.04-usb-preseed/"><base href="/lerndokumentation/" /></head><body id="ubuntu-20-04-bootable-usb-key-mit-preseed" class="post-layout"><header class="header"> <a class="header__title" href="/lerndokumentation/">Way-Up 2020-2022</a><nav><ul class="header__list"><li><a href="/lerndokumentation/">Home</a></li><li><a href="https://www.puzzle.ch/de/blog/articles/author/fbertagna">Über mich</a></li></ul></nav></header><main class="💈"><div class="post"><article itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting"><div class="post__header section-padding--double"><div class="grid-small"><h2 itemprop="name headline">Ubuntu 20.04 - Bootable USB Key mit preseed</h2><time class="post__date" datetime="2020-08-04T00:00:00+00:00" itemprop="datePublished">4 Aug 2020</time></div></div><div class="post__img"><div><figure class="absolute-bg" style="background-image: url('/lerndokumentation/assets/images/ubuntu-preseed.png');"></figure></div></div><div class="post__content section-padding"><div class="grid"><div id="markdown" itemprop="articleBody"></div></div></div><div class="section-padding--none"><div class="grid"><hr class="sep"/></div></div><div class="section-padding"><div class="grid-small"> <span class="post__author">Posted by <a href="https://www.puzzle.ch/de/blog/articles/author/fbertagna" title="More By Fabio Bertagna">Fabio Bertagna</a></span><p class="post__bio"></p></div></div></article></div><section class="related section-padding"><div class="grid-xlarge"><h2 class="related__title">Related</h2><div class="related__container"><article class="related__post"> <a class="related__link" href="/lerndokumentation/2020/08/21/ubuntu-20.04-user-setup-mit-ansible/"><figure class="related__img"> <img src="/lerndokumentation/assets/images/pubuntu.png" alt="Ubuntu-20.04 - User-Setup mit Ansible"/></figure><div><h2 class="related__text">Ubuntu-20.04 - User-Setup mit Ansible</h2></div></a></article><article class="related__post"> <a class="related__link" href="/lerndokumentation/2020/08/04/ubuntu-20.04-usb-preseed/"><figure class="related__img"> <img src="/lerndokumentation/assets/images/ubuntu-preseed.png" alt="Ubuntu 20.04 - Bootable USB Key mit preseed"/></figure><div><h2 class="related__text">Ubuntu 20.04 - Bootable USB Key mit preseed</h2></div></a></article></div></div></section></main><footer class="footer section-padding"><div class="grid"><hr class="sep--white"/><div class="footer__container"><ul class="footer__tags"><li><a class="footer__link" href="/tag/linux">Linux</a></li><li><a class="footer__link" href="/tag/ansible">Ansible</a></li><li><a class="footer__link" href="/tag/ubuntu">Ubuntu</a></li><li><a class="footer__link" href="/tag/prometheus">Prometheus</a></li></ul></div></div></footer><script src="/lerndokumentation/assets/js/app.min.js"></script></body></html>
+<!DOCTYPE html><html lang="en"><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Ubuntu 20.04 - Bootable USB Key mit preseed | Way-Up 2020-2022</title><meta name="description" content="Dokunentation meiner Ausbildung bei Puzzle ITC zum Systemtechniker EFZ."><meta itemprop="name" content="Fabio Bertagna"><meta itemprop="description" content="Dokunentation meiner Ausbildung bei Puzzle ITC zum Systemtechniker EFZ."><meta itemprop="image" content="/lerndokumentation/assets/images/ubuntu-preseed.png"><meta property="og:url" content="/lerndokumentation/2020/08/04/ubuntu-20.04-usb-preseed/"><meta property="og:type" content="website"><meta property="og:title" content="Ubuntu 20.04 - Bootable USB Key mit preseed | Way-Up 2020-2022"><meta property="og:site_name" content="Way-Up 2020-2022"><meta property="og:description" content="Dokunentation meiner Ausbildung bei Puzzle ITC zum Systemtechniker EFZ."><meta property="og:image" content="/lerndokumentation/assets/images/ubuntu-preseed.png"><link rel="icon" type="image/x-icon" href="/lerndokumentation/assets/images/favicon.ico"><link rel="stylesheet" href="/lerndokumentation/assets/css/app.css"><link rel="stylesheet" href="/lerndokumentation/assets/css/syntax.css"><link rel="alternate" type="application/rss+xml" title="Way-Up 2020-2022" href="/lerndokumentation/feed.xml"><link rel="canonical" href="/lerndokumentation/2020/08/04/ubuntu-20.04-usb-preseed/"><base href="/lerndokumentation/" /></head><body id="ubuntu-20-04-bootable-usb-key-mit-preseed" class="post-layout"><header class="header"> <a class="header__title" href="/lerndokumentation/">Way-Up 2020-2022</a><nav><ul class="header__list"><li><a href="/lerndokumentation/">Home</a></li><li><a href="https://www.puzzle.ch/de/blog/articles/author/fbertagna">Über mich</a></li></ul></nav></header><main class="💈"><div class="post"><article itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting"><div class="post__header section-padding--double"><div class="grid-small"><h2 itemprop="name headline">Ubuntu 20.04 - Bootable USB Key mit preseed</h2><time class="post__date" datetime="2020-08-04T00:00:00+00:00" itemprop="datePublished">4 Aug 2020</time></div></div><div class="post__img"><div><figure class="absolute-bg" style="background-image: url('/lerndokumentation/assets/images/ubuntu-preseed.png');"></figure></div></div><div class="post__content section-padding"><div class="grid"><div id="markdown" itemprop="articleBody"><p>Für die Entwicklung des neuen automatisierten Ubuntu 20.04 - PXE Setup musste ich mir zu Beginn eine Test-Umgebung einrichten. Hierbei habe ich mich entschieden, jeweils ein Ubuntu-Image mit meinen Preeseds, Configs und Skripts lokal zu bauen und anschliessend diese auf einen USB-Stick zu flashen und an eimem Testgerät zu testen.</p><p>Als Erstes habe ich versucht ein Ubuntu Image auf einen USB-Stick mit <code class="language-plaintext highlighter-rouge">dd</code> zu schreiben und anschliessend dort drauf in den entsprechenden Dateien Boot-Paramter anzupassen so wie auch Preseed-Files und Scripts zu hinterlegen. Hier musste ich leider feststellen, dass das offizielle Ubuntu-20.04-LTS Image als read-only Filesystem auf den Stick geschrieben wird. Dies wahrscheinlich aus Sicherheitsgründen, da so die Integrität des Images gewährleistet weren kann.</p><p>Daher habe ich zum Testen der Preseeds und Setup-Scripts ein Bash-Tool geschrieben welches das Bauen von benuzerdefinierte Images automatisieren sollte. Das Skript sollte in folgenden Schritten ablaufen:</p><ol><li>Überprüfung auf korrekte Ausführung.</li><li>Benötigte Software installieren.</li><li>Erstellen einer temporären Ausführungs-Umgebung.</li><li>ISO falls nötig aus dem Ubuntu Archiv herunterladen.</li><li>Ubuntu 20.04 ISO mounten.</li><li>Das gemountete Image kopieren und bearbeiten.</li><li>MD5 Checksum der Kopie neu berechnen und im neuen Image speichern.</li><li>Neues ISO aus der Kopie anfertigen.</li></ol><p>Im Skript ist diese Prozedur im <code class="language-plaintext highlighter-rouge">main()</code> folgendermassen abgebilder:</p><div class="language-bash highlighter-rouge"><div class="highlight"><pre class="syntax"><code><span class="k">function </span>main<span class="o">()</span> <span class="o">{</span>
+    _ensure_proper_usage <span class="nv">$@</span>
+    _ensure_dependencies
+    _create_temporary_runtime_environment
+    _get_iso
+    _mount_iso
+    _create_custom_iso
+    _md5_custom_iso
+    _build_custom_iso
+<span class="o">}</span>
+</code></pre></div></div><h3 id="1-überprüfung-auf-korrekte-ausführung">1. Überprüfung auf korrekte Ausführung</h3><p>Das Tool soll höchstens einen Parameter entgegen nehmen und muss als root ausgeführt werden. Weiter soll der Parameter, falls vorhanden, auf seine Gültigkeit überprüft werden und die entsprechenden globalen Variabeln gesetzt werden.</p><p>Der einzig gültige Parameter heisst <code class="language-plaintext highlighter-rouge">--official-source</code> und falls dieser gesetzt wurde, weiss das Skript, dass das Ursprungs-Image zuerst aus dem Ubuntu-Archiv heruntergeladen werden muss. Also wird hier die Variabel <code class="language-plaintext highlighter-rouge">FROM_OFFICIAL_SOURCE</code> auf <code class="language-plaintext highlighter-rouge">true</code> gesetzt.</p><p>Im Skript sind diese Schritte in der Funktion <code class="language-plaintext highlighter-rouge">_ensure_proper_usage()</code> zusammengefasst:</p><div class="language-bash highlighter-rouge"><div class="highlight"><pre class="syntax"><code><span class="nv">FROM_OFFICIAL_SOURCE</span><span class="o">=</span><span class="nb">false
+
+</span><span class="k">function </span>_ensure_proper_usage<span class="o">()</span> <span class="o">{</span>
+    <span class="c"># Check if run as root</span>
+    <span class="k">if</span> <span class="o">[</span> <span class="s2">"</span><span class="nv">$EUID</span><span class="s2">"</span> <span class="nt">-ne</span> 0 <span class="o">]</span><span class="p">;</span> <span class="k">then
+        </span>__error_exit <span class="s2">"Please run as root"</span>
+    <span class="k">fi</span>
+
+    <span class="c"># accept max. 1 argument</span>
+    <span class="k">if</span> <span class="o">[</span> <span class="nv">$# </span><span class="nt">-gt</span> 1 <span class="o">]</span><span class="p">;</span> <span class="k">then
+        </span>__print_usage
+        __error_exit <span class="s2">"Accepts only one argument."</span>
+    <span class="k">fi</span>
+
+    <span class="c"># if there is one argument</span>
+    <span class="k">if</span> <span class="o">[</span> <span class="nv">$# </span><span class="nt">-eq</span> 1 <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+        <span class="c"># and it is '--official-source'</span>
+        <span class="c"># then set FROM_OFFICIAL_SOURCE flag to true</span>
+        <span class="k">if</span> <span class="o">[</span> <span class="s2">"</span><span class="nv">$1</span><span class="s2">"</span> <span class="o">=</span> <span class="s2">"--official-source"</span> <span class="o">]</span><span class="p">;</span> <span class="k">then
+            </span><span class="nv">FROM_OFFICIAL_SOURCE</span><span class="o">=</span><span class="nb">true
+        </span><span class="k">else
+            </span>__print_usage
+            __error_exit <span class="s2">"Invalid option </span><span class="nv">$1</span><span class="s2">"</span>
+        <span class="k">fi
+     fi</span>
+<span class="o">}</span>
+</code></pre></div></div><p>Wird beim überprüfen der Parameter einen Fehler festgestellt, werden mit der Funktion <code class="language-plaintext highlighter-rouge">__print_usage</code> die Anwendungs-Spezifikationen auf der Konsole ausgegeben und anschliessend das Skript mit dem Exit-Code 1 beendet.</p><p>Beim Programmieren dieser Funktion, war es erstmals wichtig wie in einem Bash-Skript die Argumente abgerufen werden. Im Code sieht man wie ich für diesen einfachen Argument-Parser die Bash-Variablen <code class="language-plaintext highlighter-rouge">$#</code> und <code class="language-plaintext highlighter-rouge">$1</code> verwendet habe. Beim Recherchieren habe ich oft auch gesehen, dass fürs Parsen der Argumente Case-Statements verwendet werden, jedoch war es einfacher bei nur einem möglichen Argument eine If-Else-Verzweigung zu verwenden.</p><h3 id="2-installieren-der-benötigten-tools">2. Installieren der benötigten Tools</h3><p>Damit später das ISO richtig verpackt und gebaut werden kann, müssen die richtigen Tools dazu vorhanden sein. Das Skript stellt das Ganze in dieser Funktion sicher:</p><div class="language-bash highlighter-rouge"><div class="highlight"><pre class="syntax"><code><span class="k">function </span>_ensure_dependencies<span class="o">()</span> <span class="o">{</span>
+    __print <span class="s2">"Installng dependencies..."</span>
+    apt <span class="nb">install</span> <span class="se">\</span>
+        syslinux <span class="se">\</span>
+        isolinux <span class="se">\</span>
+        syslinux-utils <span class="se">\</span>
+        syslinux-efi <span class="se">\</span>
+        <span class="nt">-y</span>
+<span class="o">}</span>
+
+</code></pre></div></div><h3 id="3-erstellen-einer-temporären-ausführungs-umgebung">3. Erstellen einer Temporären Ausführungs-Umgebung</h3><p>Wird das Skript ausgefüht soll sich der Benutzende nicht Sorgen machen um Dateien welche nach der Ausführung liegenbleiben und anschliessend vom User gelöscht werden müssen. Deshalb wird im Skript als Nächstes im <code class="language-plaintext highlighter-rouge">/tmp/</code> Ordner ein temporärer Ordner erstellt, wo das Skript weiter drin arbeiten wird. Ist das Skript fertig oder bricht es ab, wird im Skiript mit einem <code class="language-plaintext highlighter-rouge">trap</code> sichergestellt, dass der zu Beginn erstellte temporäre ordner gelöscht wird.</p><div class="language-bash highlighter-rouge"><div class="highlight"><pre class="syntax"><code><span class="k">function </span>_create_temporary_runtime_environment<span class="o">()</span> <span class="o">{</span>
+    <span class="nv">EXEC_DIR</span><span class="o">=</span><span class="s2">"</span><span class="si">$(</span><span class="nb">dirname</span> <span class="s2">"</span><span class="si">$(</span><span class="nb">readlink</span> <span class="nt">-f</span> <span class="s2">"</span><span class="nv">$0</span><span class="s2">"</span><span class="si">)</span><span class="s2">"</span><span class="si">)</span><span class="s2">"</span>
+    <span class="nb">mkdir</span> <span class="nt">-p</span> <span class="s2">"</span><span class="nv">$EXEC_DIR</span><span class="s2">"</span>/logs/
+    <span class="nv">WDIR</span><span class="o">=</span><span class="s2">"</span><span class="si">$(</span><span class="nb">mktemp</span> <span class="nt">-d</span> /tmp/<span class="s2">"</span><span class="si">$(</span><span class="nb">basename</span> <span class="s2">"</span><span class="si">$(</span><span class="nb">readlink</span> <span class="nt">-f</span> <span class="s2">"</span><span class="nv">$0</span><span class="s2">"</span><span class="si">)</span><span class="s2">"</span><span class="si">)</span><span class="s2">"</span>.XXXX<span class="si">)</span><span class="s2">"</span>
+    <span class="nb">cp</span> <span class="nt">-r</span> config <span class="s2">"</span><span class="nv">$WDIR</span><span class="s2">"</span>/
+    <span class="nb">cd</span> <span class="s2">"</span><span class="nv">$WDIR</span><span class="s2">"</span>
+    <span class="nb">trap</span> <span class="s1">'sudo umount $WDIR/*; rm -rf $WDIR;'</span> EXIT ERR
+<span class="o">}</span>
+</code></pre></div></div><h3 id="4-source-des-ubuntu-images-bestimmen">4. Source des Ubuntu Images bestimmen.</h3><p>Als Nächstes braucht das Skript zu wissen, wo das Original-Ubuntu-ISO liegt. Hier wird als erstes überprüft ob im ersten Schritt <code class="language-plaintext highlighter-rouge">_ensure_proper_usage</code> das Flag <code class="language-plaintext highlighter-rouge">FROM_OFFICIAL_SOURCE</code> auf <code class="language-plaintext highlighter-rouge">true</code> gesetzt wurde. Falls das nicht der Fall war, wird zunächst der User gefragt ob das Skript mit einem lokalen ISO fortfahren soll oder ob zuerst das ISO vom releases.ubuntu.com-Archiv heruntergeladen werden muss:</p><div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="syntax"><code>1) Ubuntu 20.04 LTS web archive
+2) local .iso
+What base image should be used? 
+</code></pre></div></div><p>Möchte der User ein lokales ISO verwenden wir als nächstes gefragt den Pfad zu der lokalen Datei anzugeben. Möchte er das Image herunterladen, wird die Funktion <code class="language-plaintext highlighter-rouge">download_official_img</code> aufgerufen, welche das Image herunterlädt und es in der temporären Umgebung abspeichert. Das alles sieht im Code wie folgt aus:</p><div class="language-bash highlighter-rouge"><div class="highlight"><pre class="syntax"><code><span class="nv">INPUT_ISO</span><span class="o">=</span><span class="s2">""</span>
+
+<span class="k">function </span>__download_official_img<span class="o">()</span> <span class="o">{</span>
+    __print <span class="s2">"downloading image"</span>
+    <span class="nv">_ARCHIVE_URL</span><span class="o">=</span>https://releases.ubuntu.com/20.04/ubuntu-20.04.1-desktop-amd64.iso
+    <span class="nv">INPUT_ISO</span><span class="o">=</span><span class="nv">$WDIR</span>/<span class="si">$(</span><span class="nb">basename</span> <span class="s2">"</span><span class="nv">$_ARCHIVE_URL</span><span class="s2">"</span><span class="si">)</span>
+    wget <span class="nv">$_ARCHIVE_URL</span>
+<span class="o">}</span>
+
+<span class="k">function </span>__prompt_and_get_local_iso<span class="o">()</span> <span class="o">{</span>
+    <span class="nb">cd</span> <span class="s2">"</span><span class="nv">$EXEC_DIR</span><span class="s2">"</span>
+    <span class="nb">read</span> <span class="nt">-e</span> <span class="nt">-p</span> <span class="s2">"Set path to base .iso:  "</span> INPUT_ISO
+
+    <span class="k">if</span> <span class="o">[[</span> <span class="o">!</span> <span class="nt">-f</span> <span class="s2">"</span><span class="nv">$INPUT_ISO</span><span class="s2">"</span> <span class="o">&amp;&amp;</span> <span class="o">!</span> <span class="nt">-f</span> <span class="s2">"</span><span class="nv">$WDIR</span><span class="s2">/</span><span class="nv">$INPUT_ISO</span><span class="s2">"</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then
+        </span>__error_exit <span class="s2">"Input .iso not found. Aborting build"</span>
+    <span class="k">fi
+
+    </span><span class="nv">INPUT_ISO</span><span class="o">=</span><span class="s2">"</span><span class="si">$(</span><span class="nb">realpath</span> <span class="s2">"</span><span class="nv">$INPUT_ISO</span><span class="s2">"</span><span class="si">)</span><span class="s2">"</span>
+
+    <span class="nb">cd</span> <span class="s2">"</span><span class="nv">$WDIR</span><span class="s2">"</span>
+<span class="o">}</span>
+
+<span class="k">function </span>_get_iso<span class="o">()</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">!</span> <span class="nv">$FROM_OFFICIAL_SOURCE</span><span class="p">;</span> <span class="k">then
+        </span><span class="nv">PS3</span><span class="o">=</span><span class="s2">"What base image should be used?  "</span>
+        <span class="nv">options</span><span class="o">=(</span><span class="s2">"Ubuntu 20.04 LTS web archive"</span> <span class="s2">"local .iso"</span><span class="o">)</span>
+        <span class="k">select </span>opt <span class="k">in</span> <span class="s2">"</span><span class="k">${</span><span class="nv">options</span><span class="p">[@]</span><span class="k">}</span><span class="s2">"</span><span class="p">;</span> <span class="k">do
+            case</span> <span class="nv">$opt</span> <span class="k">in</span>
+            <span class="s2">"Ubuntu 20.04 LTS web archive"</span><span class="p">)</span>
+                __download_official_img
+                <span class="nb">break</span>
+                <span class="p">;;</span>
+            <span class="s2">"local .iso"</span><span class="p">)</span>
+                __prompt_and_get_local_iso
+                <span class="nb">break</span>
+                <span class="p">;;</span>
+            <span class="k">*</span><span class="p">)</span> __print <span class="s2">"invalid option </span><span class="nv">$REPLY</span><span class="s2">"</span> <span class="p">;;</span>
+            <span class="k">esac</span>
+        <span class="k">done
+    else
+        </span>__download_official_img
+    <span class="k">fi</span>
+<span class="o">}</span>
+</code></pre></div></div><h3 id="5-das-originale-iso-mounten-und-kopie-bearbeiten">5. Das originale ISO mounten und Kopie bearbeiten</h3><p>Nun beginnt das Skript mit dem ersten Schritt seiner Hauptaufgabe. Damit wir eine Kopie des Originalen ISO machen und anschliessend bearbeiten können, müssen wir das ISO erstmals mounten:</p><div class="language-bash highlighter-rouge"><div class="highlight"><pre class="syntax"><code><span class="k">function </span>_mount_iso<span class="o">()</span> <span class="o">{</span>
+    __print <span class="s2">"Creating mountpoint"</span>
+
+    <span class="nb">mkdir</span> <span class="nt">-p</span> <span class="s2">"</span><span class="nv">$WDIR</span><span class="s2">"</span>/iso-build <span class="s2">"</span><span class="nv">$WDIR</span><span class="s2">"</span>/mnt/iso-build-orig
+
+    <span class="nv">MOUNTPOINT_ORIG</span><span class="o">=</span><span class="nv">$WDIR</span>/mnt/iso-build-orig
+
+    __print_n <span class="s2">"Mounting iso "</span>
+    mount <span class="nt">-o</span> loop <span class="s2">"</span><span class="nv">$INPUT_ISO</span><span class="s2">"</span> <span class="s2">"</span><span class="nv">$MOUNTPOINT_ORIG</span><span class="s2">"</span> <span class="o">&gt;</span>&amp;<span class="s2">"</span><span class="nv">$EXEC_DIR</span><span class="s2">"</span>/logs/mount.log &amp;
+    __wait_for_process <span class="nv">$!</span>
+<span class="o">}</span>
+</code></pre></div></div><p>Nun kann das System die Dateien des ISOs lesen.</p><h3 id="6-gemountetes-image-kopieren-und-bearbeiten">6. Gemountetes Image kopieren und bearbeiten</h3><p>Nun wird der Schritt durchgeführt welcher das neue Image zusammenstellt. Hier wird erstmals das zuvor gemountete Image in einen neuen Ordner kopiert wo anschliessend die Notwendigen Änderungen an den neu kopierten Dateien vorgenommen werden.</p><p>Die Dateien welche für den Preseed-Install verwendet werden sollen, werden vom Skript in einem Ordner mit folgender Datei-Struktur erwartet:</p><div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="syntax"><code>.
+|-config
+    |- custom.seed
+    |- txt.cfg
+    |- grub.cfg
+    |- preseed-files
+        |- ...
+</code></pre></div></div><p>Hier ist das <code class="language-plaintext highlighter-rouge">custom.seed</code> das Preseed-File, das <code class="language-plaintext highlighter-rouge">txt.cfg</code> die Isolinux boot config mit den eigenen Kernel-Boot-Parameter welche, das <code class="language-plaintext highlighter-rouge">grub.cfg</code> die GRUB config auch hier mit den angepassten Kernel-Boot-Parameter und der <code class="language-plaintext highlighter-rouge">preseed-files</code> Ordner welcher Dateien enthält welche z.B. im Preseed-File als Skript aufgerufen werden.</p><p>Das Skript überprüft jeweils ob diese Files existieren, und kopiert sie anschliessend an den richtigen Ort der ISO-Kopie.</p><div class="language-bash highlighter-rouge"><div class="highlight"><pre class="syntax"><code><span class="k">function </span>__ensure_config_file<span class="o">()</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">!</span> <span class="nb">test</span> <span class="nt">-f</span> <span class="s2">"</span><span class="nv">$1</span><span class="s2">"</span><span class="p">;</span> <span class="k">then
+        </span>__error_exit <span class="s2">"No </span><span class="nv">$1</span><span class="s2"> file in ./config/ directory found. Aborting build."</span>
+    <span class="k">fi</span>
+<span class="o">}</span>
+
+
+<span class="k">function </span>_create_custom_iso<span class="o">()</span> <span class="o">{</span>
+
+    <span class="nv">CUSTOM_ISO_ROOT</span><span class="o">=</span><span class="nv">$WDIR</span>/mnt/iso-build
+
+    __print_n <span class="s2">"Copying content of original iso "</span>
+    <span class="nb">cp</span> <span class="nt">-r</span> <span class="s2">"</span><span class="nv">$MOUNTPOINT_ORIG</span><span class="s2">/."</span> <span class="s2">"</span><span class="nv">$CUSTOM_ISO_ROOT</span><span class="s2">/"</span> &amp;
+    __wait_for_process <span class="nv">$!</span>
+
+    __print <span class="s2">"Copying custom configurations from ./config to the new image"</span>
+    __ensure_config_file <span class="s2">"</span><span class="nv">$WDIR</span><span class="s2">"</span>/config/txt.cfg
+    <span class="nb">cp</span> <span class="s2">"</span><span class="nv">$WDIR</span><span class="s2">"</span>/config/txt.cfg <span class="s2">"</span><span class="nv">$CUSTOM_ISO_ROOT</span><span class="s2">"</span>/isolinux/
+    <span class="nb">chmod </span>444 <span class="s2">"</span><span class="nv">$CUSTOM_ISO_ROOT</span><span class="s2">"</span>/isolinux/txt.cfg
+
+    __ensure_config_file <span class="s2">"</span><span class="nv">$WDIR</span><span class="s2">"</span>/config/grub.cfg
+    <span class="nb">cp</span> <span class="s2">"</span><span class="nv">$WDIR</span><span class="s2">"</span>/config/grub.cfg <span class="s2">"</span><span class="nv">$CUSTOM_ISO_ROOT</span><span class="s2">"</span>/boot/grub/
+    <span class="nb">chmod </span>444 <span class="s2">"</span><span class="nv">$CUSTOM_ISO_ROOT</span><span class="s2">"</span>/boot/grub/grub.cfg
+
+    __ensure_config_file <span class="s2">"</span><span class="nv">$WDIR</span><span class="s2">"</span>/config/custom.seed
+    <span class="nb">cp</span> <span class="s2">"</span><span class="nv">$WDIR</span><span class="s2">"</span>/config/custom.seed <span class="s2">"</span><span class="nv">$CUSTOM_ISO_ROOT</span><span class="s2">"</span>/preseed/
+    <span class="nb">chmod </span>444 <span class="s2">"</span><span class="nv">$CUSTOM_ISO_ROOT</span><span class="s2">"</span>/preseed/custom.seed
+
+    <span class="nb">mkdir</span> <span class="nt">-p</span> <span class="s2">"</span><span class="nv">$CUSTOM_ISO_ROOT</span><span class="s2">"</span>/preseed-files/
+    <span class="nb">cp</span> <span class="nt">-r</span> <span class="s2">"</span><span class="nv">$WDIR</span><span class="s2">"</span>/config/preseed-files/. <span class="s2">"</span><span class="nv">$CUSTOM_ISO_ROOT</span><span class="s2">"</span>/preseed-files/
+<span class="o">}</span>
+</code></pre></div></div><h3 id="7-md5-checksum-neu-berechnen">7. MD5 Checksum neu berechnen</h3><p>Der letzte Schritt vor dem Bauen des neuen ISO-Image ist die MD5 Checksums im md5sum.txt der ISO-Kopie anzupassen. Dieser Schritt ist notwendig, damit das Image , welches wir bauen möchten, beim Booten auf Authentizität überprüft werden kann.</p><div class="language-bash highlighter-rouge"><div class="highlight"><pre class="syntax"><code><span class="k">function </span>_md5_custom_iso<span class="o">()</span> <span class="o">{</span>
+    <span class="nb">cd</span> <span class="s2">"</span><span class="nv">$CUSTOM_ISO_ROOT</span><span class="s2">"</span>
+    __print_n <span class="s2">"Recomputing md5sum "</span>
+    <span class="nb">echo</span> <span class="s2">""</span> <span class="o">&gt;</span><span class="s2">"</span><span class="nv">$CUSTOM_ISO_ROOT</span><span class="s2">"</span>/md5sum.txt
+    find boot casper pool <span class="nb">install </span>dists EFI .disk pics preseed <span class="nt">-type</span> f <span class="nt">-print0</span> <span class="se">\</span>
+        | xargs <span class="nt">-0</span> <span class="nt">-I</span> % bash <span class="nt">-c</span> <span class="s2">"md5sum % &gt;&gt; </span><span class="se">\"</span><span class="nv">$CUSTOM_ISO_ROOT</span><span class="se">\"</span><span class="s2">/md5sum.txt"</span> <span class="se">\</span>
+        <span class="o">&gt;</span>&amp;<span class="s2">"</span><span class="nv">$EXEC_DIR</span><span class="s2">"</span>/logs/md5sum.log &amp;
+    __wait_for_process <span class="nv">$!</span>
+<span class="o">}</span>
+</code></pre></div></div><h3 id="8-bauen-des-neuen-iso-image">8. Bauen des neuen ISO-Image</h3><p>Alles ist nun bereit fürs Bauen des neuen Images. Hierzu nimmt das Skript den Master-Boot-Record des originalen Images mit <code class="language-plaintext highlighter-rouge">dd</code> in eine Kopie, und anschliessend wird das ISO mit <code class="language-plaintext highlighter-rouge">xorriso</code> gebuildet.</p><div class="language-bash highlighter-rouge"><div class="highlight"><pre class="syntax"><code><span class="k">function </span>_build_custom_iso<span class="o">()</span> <span class="o">{</span>
+    <span class="nb">cd</span> <span class="s2">"</span><span class="nv">$CUSTOM_ISO_ROOT</span><span class="s2">"</span>
+    __print_n <span class="s2">"Building isohybrid UEFI ./pubuntu-20.04-desktop-amd64.iso "</span>
+    
+    <span class="nv">MBR_FILE</span><span class="o">=</span>/tmp/ubuntu_isohybrid_mbr.img
+    <span class="nb">trap</span> <span class="s1">'rm -rf $MBR_FILE'</span> EXIT RETURN ERR
+
+    <span class="nb">dd </span><span class="k">if</span><span class="o">=</span><span class="s2">"</span><span class="nv">$INPUT_ISO</span><span class="s2">"</span> <span class="nv">bs</span><span class="o">=</span>1 <span class="nv">count</span><span class="o">=</span>446 <span class="nv">of</span><span class="o">=</span><span class="s2">"</span><span class="nv">$MBR_FILE</span><span class="s2">"</span> <span class="se">\</span>
+        <span class="o">&gt;</span>&amp;<span class="s2">"</span><span class="nv">$EXEC_DIR</span><span class="s2">"</span>/logs/orig_iso_copy.log
+
+    xorriso <span class="nt">-as</span> mkisofs <span class="nt">-r</span> <span class="nt">-V</span> <span class="s2">"Pubuntu 20.04 LTS - Puzzle ITC"</span> <span class="se">\</span>
+        <span class="nt">-cache-inodes</span> <span class="nt">-J</span> <span class="nt">-l</span> <span class="se">\</span>
+        <span class="nt">-isohybrid-mbr</span> <span class="s2">"</span><span class="nv">$MBR_FILE</span><span class="s2">"</span> <span class="se">\</span>
+        <span class="nt">-c</span> isolinux/boot.cat <span class="se">\</span>
+        <span class="nt">-b</span> isolinux/isolinux.bin <span class="se">\</span>
+        <span class="nt">-no-emul-boot</span> <span class="nt">-boot-load-size</span> 4 <span class="nt">-boot-info-table</span> <span class="se">\</span>
+        <span class="nt">-eltorito-alt-boot</span> <span class="se">\</span>
+        <span class="nt">-e</span> boot/grub/efi.img <span class="se">\</span>
+        <span class="nt">-no-emul-boot</span> <span class="nt">-isohybrid-gpt-basdat</span> <span class="se">\</span>
+        <span class="nt">-o</span> <span class="s2">"</span><span class="nv">$EXEC_DIR</span><span class="s2">/pubuntu-20.04-desktop-amd64.iso"</span> <span class="se">\</span>
+        <span class="s2">"</span><span class="nv">$CUSTOM_ISO_ROOT</span><span class="s2">"</span> <span class="o">&gt;</span>&amp;<span class="s2">"</span><span class="nv">$EXEC_DIR</span><span class="s2">"</span>/logs/xorriso.log &amp;
+    __wait_for_process <span class="nv">$!</span>
+
+    <span class="nb">rm</span> <span class="s2">"</span><span class="nv">$MBR_FILE</span><span class="s2">"</span>
+
+    __print <span class="s2">"Done!"</span>
+
+    <span class="nb">cd</span> <span class="s2">"</span><span class="nv">$WDIR</span><span class="s2">"</span>
+
+    umount <span class="s2">"</span><span class="nv">$MOUNTPOINT_ORIG</span><span class="s2">"</span>
+<span class="o">}</span>
+</code></pre></div></div><p>Ist <code class="language-plaintext highlighter-rouge">xrriso</code> fertig, kann nun das Skript die Umgebung wieder aufräumen und ist dann mit seiner Ausführung fertig.</p><h3 id="learnings">Learnings</h3><p>Die Automatisierung dieses Ablaufes war für mich in vielen Aspekten eine gute Übung. Bevor ich dieses Command Line Tool geschriben habe, ist mir sehr bald aufgefallen, dass ich den selben Ablauf im Terminal wieder und wieder durchführte um die Preseed-Files in der Ubuntu-Installation testen zu können. So habe ich versucht möglichst viele Tasks und Befehle in meinen Arbeitsabläufen zu identifizieren, welche ich im Skript automatisieren kann. Weiter konnte ich mit diesem Skript meine Bash-Kenntnisse vertiefen und anwenden. Dabei fand ich es persönlich sehr nützlich und spannend folgendes im Bash zu lernen:</p><ul><li>Wie man Argumente parst und überprüft</li><li>Ein menu mit <code class="language-plaintext highlighter-rouge">options</code> zu implementieren</li><li>Error-Handling mit <code class="language-plaintext highlighter-rouge">trap</code></li><li>Mit <code class="language-plaintext highlighter-rouge">mktemp</code> temporäre Ordner erstellen</li><li>Asynchrone Tasks implementieren mithilfe von <code class="language-plaintext highlighter-rouge">&amp;</code></li><li>Einen einfachen ‘Ladebalken’ zu implementieren welcher auf &amp;-Subshells wartet</li></ul><p>Das ganze Skript ist <a href="https://gist.github.com/DonGiovanni83/bb9d72d279e274c0f72394589a9629ab">hier</a> auf Github zu finden.</p></div></div></div><div class="section-padding--none"><div class="grid"><hr class="sep"/></div></div><div class="section-padding"><div class="grid-small"> <span class="post__author">Posted by <a href="https://www.puzzle.ch/de/blog/articles/author/fbertagna" title="More By Fabio Bertagna">Fabio Bertagna</a></span><p class="post__bio"></p></div></div></article></div><section class="related section-padding"><div class="grid-xlarge"><h2 class="related__title">Related</h2><div class="related__container"><article class="related__post"> <a class="related__link" href="/lerndokumentation/2020/08/21/ubuntu-20.04-user-setup-mit-ansible/"><figure class="related__img"> <img src="/lerndokumentation/assets/images/pubuntu.png" alt="Ubuntu-20.04 - User-Setup mit Ansible"/></figure><div><h2 class="related__text">Ubuntu-20.04 - User-Setup mit Ansible</h2></div></a></article><article class="related__post"> <a class="related__link" href="/lerndokumentation/2020/08/04/ubuntu-20.04-usb-preseed/"><figure class="related__img"> <img src="/lerndokumentation/assets/images/ubuntu-preseed.png" alt="Ubuntu 20.04 - Bootable USB Key mit preseed"/></figure><div><h2 class="related__text">Ubuntu 20.04 - Bootable USB Key mit preseed</h2></div></a></article></div></div></section></main><footer class="footer section-padding"><div class="grid"><hr class="sep--white"/><div class="footer__container"><ul class="footer__tags"><li><a class="footer__link" href="/tag/linux">Linux</a></li><li><a class="footer__link" href="/tag/ansible">Ansible</a></li><li><a class="footer__link" href="/tag/ubuntu">Ubuntu</a></li><li><a class="footer__link" href="/tag/prometheus">Prometheus</a></li></ul></div></div></footer><script src="/lerndokumentation/assets/js/app.min.js"></script></body></html>
   
