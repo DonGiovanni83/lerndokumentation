@@ -24,7 +24,7 @@ auf 20.04. das Setup der neuen Betriebssystem-Version anzupassen und, so weit m�
 Dazu habe ich mich erstmals mit dem bestehenden Setup auseinandersetzen müssen, um zu sehen wie das Ganze zurzeit
 funktionierte und anschliessend alle Schritte vom PXE-Boot bis zum Ansible-Setup dem neuen Betriebssystem anpassen.
 
-Mit allen Neuerungen und Anpassungen kann das bestehende Setup in folgenden Schritten abgebildet werden, welche ich 
+Mit allen Neuerungen und Anpassungen kann das bestehende Setup in folgenden Schritten abgebildet werden, welche ich
 anschliessend noch etwas genauer beschreiben werde, zusammenfasst werden:
 
 
@@ -60,7 +60,7 @@ Mit diesem Argument wird der Pfad zur Preseed-Datei angegeben, welche wir gleich
 Wurde der Netboot-Installer geladen, startet der debian-installer und die Installation beginnt. Normalerweise würd man an diesem
 Punkt auf Konfigurationsfragen wie z.B. Tastatur-Layout, Netzwerk, Festplatten-Partitionierung und Verschlüsselung, Sprache
 oder Benutzereinrichtung. Da aber die ganze Installation automatisiert sein soll, verwenden wir das oben erwähnte Preseed-File. Diese
-Datei enthält alle Antworten auf die Fragen, welche der debian-installer während der Installation fragen wird plus noch einige 
+Datei enthält alle Antworten auf die Fragen, welche der debian-installer während der Installation fragen wird plus noch einige
 Extra-Befehle die am Schluss der Installation ausgeführt werden um die Installation auf unsere Puzzle-Wünsche anzupassen.
 
 Wie ein solches Preseed-File ausswhen kann und wie man es zusammenstellt ist wird [hier](https://help.ubuntu.com/lts/installation-guide/s390x/apb.html) in der Ubuntu Dokumentation erklärt. Wichtig für unser Setup aber ist besonders diese Voreinstellung der Installation:
@@ -80,7 +80,7 @@ d-i preseed/late_command string \
 
 Für unser automatisiertes Setup ist der letzte Befehtl `preseed/late_command` besonders wichtig. Was hier geschieht ist, dass
 nach der Ubuntu Installation die nach dem `string` aufgeführten Befehle im neu installierten Betriebssystem ausgeführt werden.
-In unserem Fall möchten wir am Schluss der Installation ein script `oem-setup.sh` ausführen. Dafür muss dieses Skript zuerst 
+In unserem Fall möchten wir am Schluss der Installation ein script `oem-setup.sh` ausführen. Dafür muss dieses Skript zuerst
 im neuen System vorhanden und ausführbar vorliegen. Die ersten drei Befehle mounten den iPXE-Server von Puzzle und kopieren
 anschliessend das `oem-setup.sh`-Skript sowie 2 weitere Skripts welche vom `oem-setup.sh` benötigt werden auf das System.
 Diese werden anschliessend ausführbar gemacht, und zuletzt wird das `oem-setup.sh`-Skript `in-target` oder im kontext des
@@ -147,7 +147,7 @@ Was wir im `/etc/skel` machen, ist das Bash-Skript `user-setup.sh` als Startup-P
 Login dieses Skript ausgeführt wird.
 
 Ist nun das `oem-setup.sh`-Skript fertig, und der OEM-User nicht mehr gebraucht wird, sorgt der Befehl `oem-config-prerare --quiet`
-dafür, dass beim nächsten Starten des Notebooks, der OEM-User gelöscht wird (inklusive Home-Directory) und der User sich selbst auf dem 
+dafür, dass beim nächsten Starten des Notebooks, der OEM-User gelöscht wird (inklusive Home-Directory) und der User sich selbst auf dem
 Gerät registrieren kann.
 
 Mit diesem letzten Befehl ist das Staging des Notebooks abgeschlossen, und der debian-installer fährt das Gerät herunter.
@@ -280,10 +280,10 @@ beim nächsten Login nicht erneut durchgeführt wird.
 Ansible-Pull wird verwendet um ein remote Ansible-Repo aun Node zu ziehen, wo anschliessend das Repo selbstständig
 z.B. mittels Cron-Job upgedated und ausgeführt werden kann. Genau das passiert auch beim Puzzle-Ubuntu setup.
 Das Ubuntu-Ansible-Repository wird von ansible-pull gepullt und ausgeführt. Hierbei wird folgendes gemacht:
-  
-   - Benötigte Software installieren 
-   - Ungebrauchte Software entfernen 
-   - ansible-pull Cron-Job einrichten 
+
+   - Benötigte Software installieren
+   - Ungebrauchte Software entfernen
+   - ansible-pull Cron-Job einrichten
    - Den Benutzer durch einen Disk-Verschlüsselungs-Passwort-Wechsel führen
    - Puzzle-Branding, mit Fonts, Sperrbildschirm-, Hintergrunds- und Boot-Bildern einrichten
    - User-Backup einrichten
@@ -293,3 +293,9 @@ Das Ubuntu-Ansible-Repository wird von ansible-pull gepullt und ausgeführt. Hie
 
 Nach diesen Konfigurationsschritten ist das Betriebssystem fertig eingerichtet und das Gerät startet neu.
 
+### Learnings
+Das Arbeiten dan diesem Task war für mich sehr lehrreich in verschiedenen Gebieten.
+Ich habe das Ubuntu-Betriebssystem näher kennengelernt und die Installation und die Wartung
+des Systems vertieft. Die Anforderung diese Prozesse zu Automatisieren hat mir auch
+die Gelegenheit gegeben erstmals nach den [ansible-labs]() Ansible anwenden zu können
+und dabei auch mein Wissen darüber erweitern zu können.
