@@ -5,8 +5,8 @@
     <description>Dokunentation meiner Ausbildung bei Puzzle ITC zum Systemtechniker EFZ.</description>
     <link></link>
     <atom:link href="/lerndokumentation/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 23 Dec 2020 08:38:47 +0000</pubDate>
-    <lastBuildDate>Wed, 23 Dec 2020 08:38:47 +0000</lastBuildDate>
+    <pubDate>Thu, 14 Jan 2021 09:03:29 +0000</pubDate>
+    <lastBuildDate>Thu, 14 Jan 2021 09:03:29 +0000</lastBuildDate>
     <generator>Jekyll v4.1.1</generator>
     
       <item>
@@ -24,7 +24,7 @@ auf 20.04. das Setup der neuen Betriebssystem-Version anzupassen und, so weit m�
 &lt;p&gt;Dazu habe ich mich erstmals mit dem bestehenden Setup auseinandersetzen müssen, um zu sehen wie das Ganze zurzeit
 funktionierte und anschliessend alle Schritte vom PXE-Boot bis zum Ansible-Setup dem neuen Betriebssystem anpassen.&lt;/p&gt;
 
-&lt;p&gt;Mit allen Neuerungen und Anpassungen kann das bestehende Setup in folgenden Schritten abgebildet werden, welche ich 
+&lt;p&gt;Mit allen Neuerungen und Anpassungen kann das bestehende Setup in folgenden Schritten abgebildet werden, welche ich
 anschliessend noch etwas genauer beschreiben werde, zusammenfasst werden:&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;/lerndokumentation/assets/images/pubuntu-setup-diagram.png&quot; alt=&quot;Pubuntu Setup Diagramm&quot; /&gt;&lt;/p&gt;
@@ -56,7 +56,7 @@ Mit diesem Argument wird der Pfad zur Preseed-Datei angegeben, welche wir gleich
 &lt;p&gt;Wurde der Netboot-Installer geladen, startet der debian-installer und die Installation beginnt. Normalerweise würd man an diesem
 Punkt auf Konfigurationsfragen wie z.B. Tastatur-Layout, Netzwerk, Festplatten-Partitionierung und Verschlüsselung, Sprache
 oder Benutzereinrichtung. Da aber die ganze Installation automatisiert sein soll, verwenden wir das oben erwähnte Preseed-File. Diese
-Datei enthält alle Antworten auf die Fragen, welche der debian-installer während der Installation fragen wird plus noch einige 
+Datei enthält alle Antworten auf die Fragen, welche der debian-installer während der Installation fragen wird plus noch einige
 Extra-Befehle die am Schluss der Installation ausgeführt werden um die Installation auf unsere Puzzle-Wünsche anzupassen.&lt;/p&gt;
 
 &lt;p&gt;Wie ein solches Preseed-File ausswhen kann und wie man es zusammenstellt ist wird &lt;a href=&quot;https://help.ubuntu.com/lts/installation-guide/s390x/apb.html&quot;&gt;hier&lt;/a&gt; in der Ubuntu Dokumentation erklärt. Wichtig für unser Setup aber ist besonders diese Voreinstellung der Installation:&lt;/p&gt;
@@ -75,7 +75,7 @@ Extra-Befehle die am Schluss der Installation ausgeführt werden um die Installa
 
 &lt;p&gt;Für unser automatisiertes Setup ist der letzte Befehtl &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;preseed/late_command&lt;/code&gt; besonders wichtig. Was hier geschieht ist, dass
 nach der Ubuntu Installation die nach dem &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;string&lt;/code&gt; aufgeführten Befehle im neu installierten Betriebssystem ausgeführt werden.
-In unserem Fall möchten wir am Schluss der Installation ein script &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;oem-setup.sh&lt;/code&gt; ausführen. Dafür muss dieses Skript zuerst 
+In unserem Fall möchten wir am Schluss der Installation ein script &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;oem-setup.sh&lt;/code&gt; ausführen. Dafür muss dieses Skript zuerst
 im neuen System vorhanden und ausführbar vorliegen. Die ersten drei Befehle mounten den iPXE-Server von Puzzle und kopieren
 anschliessend das &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;oem-setup.sh&lt;/code&gt;-Skript sowie 2 weitere Skripts welche vom &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;oem-setup.sh&lt;/code&gt; benötigt werden auf das System.
 Diese werden anschliessend ausführbar gemacht, und zuletzt wird das &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;oem-setup.sh&lt;/code&gt;-Skript &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;in-target&lt;/code&gt; oder im kontext des
@@ -140,7 +140,7 @@ Für unser automatisiertes Setup also sehr praktisch.&lt;/p&gt;
 Login dieses Skript ausgeführt wird.&lt;/p&gt;
 
 &lt;p&gt;Ist nun das &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;oem-setup.sh&lt;/code&gt;-Skript fertig, und der OEM-User nicht mehr gebraucht wird, sorgt der Befehl &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;oem-config-prerare --quiet&lt;/code&gt;
-dafür, dass beim nächsten Starten des Notebooks, der OEM-User gelöscht wird (inklusive Home-Directory) und der User sich selbst auf dem 
+dafür, dass beim nächsten Starten des Notebooks, der OEM-User gelöscht wird (inklusive Home-Directory) und der User sich selbst auf dem
 Gerät registrieren kann.&lt;/p&gt;
 
 &lt;p&gt;Mit diesem letzten Befehl ist das Staging des Notebooks abgeschlossen, und der debian-installer fährt das Gerät herunter.&lt;/p&gt;
@@ -286,6 +286,12 @@ Das Ubuntu-Ansible-Repository wird von ansible-pull gepullt und ausgeführt. Hie
 
 &lt;p&gt;Nach diesen Konfigurationsschritten ist das Betriebssystem fertig eingerichtet und das Gerät startet neu.&lt;/p&gt;
 
+&lt;h3 id=&quot;learnings&quot;&gt;Learnings&lt;/h3&gt;
+&lt;p&gt;Das Arbeiten dan diesem Task war für mich sehr lehrreich in verschiedenen Gebieten.
+Ich habe das Ubuntu-Betriebssystem näher kennengelernt und die Installation und die Wartung
+des Systems vertieft. Die Anforderung diese Prozesse zu Automatisieren hat mir auch
+die Gelegenheit gegeben erstmals nach den &lt;a href=&quot;&quot;&gt;ansible-labs&lt;/a&gt; Ansible anwenden zu können
+und dabei auch mein Wissen darüber erweitern zu können.&lt;/p&gt;
 </description>
         <pubDate>Fri, 21 Aug 2020 00:00:00 +0000</pubDate>
         <link>/lerndokumentation/2020/08/21/ubuntu-20.04-user-setup-mit-ansible/</link>
